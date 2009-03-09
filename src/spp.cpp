@@ -13,7 +13,6 @@
 #include "alt_precompute.h"
 #include "malt_heuristic.h"
 
-
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
