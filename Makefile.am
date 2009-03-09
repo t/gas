@@ -1,12 +1,3 @@
-lib_LTLIBRARIES =
-noinst_PROGRAMS    =
-noinst_SCRIPTS     =
-noinst_LTLIBRARIES =
-
-noinst_LTLIBRARIES += libgflags.la
-libgflags_la_SOURCES = lib/gflags/src/gflags.h \
-                       lib/gflags/src/gflags.cc \
-                       lib/gflags/src/gflags_reporting.cc
 bin_PROGRAMS = gas nhash nhash2 gr2edge
 gas_SOURCES  = src/gas.cpp \
                src/db.cpp \
@@ -19,7 +10,7 @@ gas_SOURCES  = src/gas.cpp \
                src/alt_precompute.cpp \
                src/malt_precompute.cpp \
                src/spp_experiment.cpp
-gas_LDADD=-lboost_program_options -lboost_filesystem libgflags.la
+gas_LDADD=-lboost_filesystem -lglog -lpthread -lgflags
 nhash_SOURCES=src/nhash.cpp
 nhash_LDADD=-lboost_program_options
 nhash2_SOURCES=src/nhash2.cpp
