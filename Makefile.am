@@ -10,7 +10,7 @@ gas_SOURCES  = src/gas.cpp \
                src/alt_precompute.cpp \
                src/malt_precompute.cpp \
                src/spp_experiment.cpp
-gas_LDADD=-lboost_filesystem -lglog -lpthread -lgflags
+gas_LDADD=-lboost_filesystem -lpthread -lgflags -lglog
 nhash_SOURCES=src/nhash.cpp
 nhash_LDADD=-lboost_program_options
 nhash2_SOURCES=src/nhash2.cpp

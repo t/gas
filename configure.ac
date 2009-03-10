@@ -20,8 +20,9 @@ AC_SUBST(LIBTOOL_DEPS)
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lboost_filesystem':
 AC_CHECK_LIB([boost_filesystem], [main])
-# FIXME: Replace `main' with a function in `-lboost_program_options':
-AC_CHECK_LIB([boost_program_options], [main])
+AC_CHECK_LIB([pthread], [main])
+AC_CHECK_LIB([gflags], [main])
+AC_CHECK_LIB([glog], [main])
 
 # Checks for header files.
 AC_HEADER_STDC

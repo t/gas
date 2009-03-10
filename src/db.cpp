@@ -5,32 +5,33 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
-
+#include <google/gflags.h>
 #include "db.h"
 #include "edge.h"
 
-#include "../lib/gflags/src/gflags/gflags.h"
-
-DEFINE_string(hoge2, "", "default language");
-DEFINE_string(moge2, "japanese", "default language");
+DECLARE_string(db);
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
-int db_init(const std::string& db_dir)
+bool db_check()
 {
-  cout << "moge2 = " << FLAGS_moge2 << endl;
-
-  path d(db_dir);
-  create_directory(d);
-  
-  edge_init(db_dir);
+  return true;
 }
 
-int db_tmp_init(const std::string& db_dir)
+int db_init()
 {
-  
+  create_directory(path(FLAGS_db));
+  edge_init();
+}
 
+int db(int argc, char *argv[])
+{
+  assert(argc >= 2);
+
+  if(argv[2] == "init"){
+    db_init();
+  }
 }
 

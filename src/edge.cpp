@@ -4,10 +4,13 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <time.h>
+#include <google/gflags.h>
 
 #include "btree.h"
 #include "edge.h"
 #include "seq.h"
+
+DECLARE_string(db);
 
 using namespace std;
 using namespace boost;
@@ -17,7 +20,7 @@ bool operator < (const Edge &e, const Edge &f) {
   return e.key != f.key ? e.key < f.key : e.to < f.to;
 }
 
-int edge_init(const std::string& db_dir)
+int edge_init()
 {
   Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  true);
   Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD, true);
@@ -27,7 +30,7 @@ int edge_init(const std::string& db_dir)
   delete b_btree;
 }
 
-int edge_select(const std::string& db_dir, uint64_t key, bool is_forward)
+int edge_select()
 {
   Btree<uint64_t, Edge> * btree;
   if(is_forward)
@@ -47,7 +50,7 @@ int edge_select(const std::string& db_dir, uint64_t key, bool is_forward)
   delete btree;
 }
 
-int edge_insert(const std::string& db_dir)
+int edge_insert()
 {
   Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
   Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD, false);
@@ -108,7 +111,7 @@ int edge_insert(const std::string& db_dir)
   delete b_btree;
 }
 
-int edge_random(const std::string& db_dir)
+int edge_random()
 {
   srand(time(NULL));
 
@@ -123,42 +126,7 @@ int edge_random(const std::string& db_dir)
   delete seq;
 }
 
-int edge_random_sample(const std::string& db_dir)
-{
-  set<uint64_t> samples;
-
-  int sample_size = 100000000;
-
-  const string seq_file = db_dir + FILE_SEQUENCE + "testhash";
-  MmapVector<uint64_t> * seq = new MmapVector< uint64_t >(seq_file);
-  seq->open(false);
-
-  while(samples.size() < sample_size)
-  {
-    uint64_t node = seq_get_random(seq);
-    samples.insert(node);
-  }
-
-  seq->close();
-  delete seq;
-
-  Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
-
-  for(set<uint64_t>::iterator i = samples.begin(); i != samples.end(); i++)
-  {
-    vector<Edge> links = btree->find((*i));
-    for(vector<Edge>::iterator j = links.begin(); j < links.end(); j++)
-    {
-      if(samples.find(j->to) != samples.end())
-      {
-        cout << j->key << "\t" << j->to << endl;
-      }
-    }
-  }
-
-  delete btree;
-}
-
+/*
 int edge_test(const std::string& db_dir)
 {
   srand(0);
@@ -192,7 +160,9 @@ int edge_test(const std::string& db_dir)
 
   delete btree;
 }
+*/
 
+/*
 int edge_walker_test(const std::string& db_dir)
 {
   Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
@@ -266,7 +236,9 @@ int edge_hadoop_adj_test(const std::string& db_dir)
 
   delete btree;
 }
+*/
 
+/*
 int edge_from_count(const std::string& db_dir)
 {
   Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
@@ -286,5 +258,7 @@ int edge_from_count(const std::string& db_dir)
 
   delete btree;
 }
+*/
+
 
 
