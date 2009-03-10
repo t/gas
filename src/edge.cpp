@@ -5,12 +5,15 @@
 #include <boost/filesystem/fstream.hpp>
 #include <time.h>
 #include <google/gflags.h>
+#include <glog/logging.h>
 
 #include "btree.h"
 #include "edge.h"
 #include "seq.h"
 
 DECLARE_string(db);
+DEFINE_bool(forward, "", "db path");
+DEFINE_uint64(key, 0, "db path");
 
 using namespace std;
 using namespace boost;
@@ -22,25 +25,26 @@ bool operator < (const Edge &e, const Edge &f) {
 
 int edge_init()
 {
-  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  true);
-  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD, true);
+  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  true);
+  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, true);
 
-  cout << "edge_init" << endl;
   delete f_btree;
   delete b_btree;
+
+  LOG(INFO) << "edge inited";
 }
 
 int edge_select()
 {
   Btree<uint64_t, Edge> * btree;
-  if(is_forward)
+  if(FLAGS_forward)
   {
-    btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
+    btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  false);
   }else{
-    btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD, false);
+    btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, false);
   }
 
-  vector<Edge> result = btree->find(key);
+  vector<Edge> result = btree->find(FLAGS_key);
   cout << "count: " << result.size() << endl;
   for(vector<Edge>::iterator i = result.begin(); i < result.end(); i++)
   {
@@ -52,8 +56,8 @@ int edge_select()
 
 int edge_insert()
 {
-  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
-  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD, false);
+  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  false);
+  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, false);
 
   string str, item;
 
@@ -62,7 +66,6 @@ int edge_insert()
   {
     c++;
     if(c % 10000 == 0) cout << c << endl;
-
 
     istrstream istrs((char *)str.c_str());
     int i = 0;
@@ -115,7 +118,7 @@ int edge_random()
 {
   srand(time(NULL));
 
-  const string seq_file = db_dir + FILE_SEQUENCE + "testhash";
+  const string seq_file = FLAGS_db + '/' + FILE_SEQUENCE;
   MmapVector<uint64_t> * seq = new MmapVector< uint64_t >(seq_file);
   seq->open(false);
 

@@ -16,16 +16,8 @@ struct Edge{
 
 bool operator < (const Edge &e, const Edge &f);
 
-int edge_init(const std::string& db_dir);
-int edge_select(const std::string& db_dir, uint64_t key, bool is_forward);
-int edge_insert(const std::string& db_dir);
-int edge_random(const std::string& db_dir);
-int edge_test(const std::string& db_dir);
-int edge_walker_test(const std::string& db_dir);
-int edge_hadoop_adj_test(const std::string& db_dir);
-int edge_iterator_test(const std::string& db_dir);
-int edge_from_count(const std::string& db_dir);
-int edge_random_sample(const std::string& db_dir);
+int edge_init();
+int edge(int argc, char *argv[]);
 
 #endif
 

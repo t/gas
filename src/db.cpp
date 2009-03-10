@@ -6,6 +6,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <google/gflags.h>
+#include <glog/logging.h>
 #include "db.h"
 #include "edge.h"
 
@@ -24,6 +25,8 @@ int db_init()
 {
   create_directory(path(FLAGS_db));
   edge_init();
+
+  LOG(INFO) << "db inited";
 }
 
 int db(int argc, char *argv[])
