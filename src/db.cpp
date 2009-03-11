@@ -23,17 +23,20 @@ bool db_check()
 
 int db_init()
 {
+  LOG(INFO) << "db_init is initializing [" << FLAGS_db << "]" << endl;
+
   create_directory(path(FLAGS_db));
   edge_init();
 
-  LOG(INFO) << "db inited";
+  LOG(INFO) << "db_init is complete." << endl;
 }
 
-int db(int argc, char *argv[])
+int db()
 {
-  assert(argc >= 2);
+  const vector<string> argvs = google::GetArgvs();
+  assert(argvs.size() >= 2);
 
-  if(argv[2] == "init"){
+  if(argvs[2] =="init"){
     db_init();
   }
 }

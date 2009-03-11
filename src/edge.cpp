@@ -12,7 +12,7 @@
 #include "seq.h"
 
 DECLARE_string(db);
-DEFINE_bool(forward, "", "db path");
+DEFINE_bool(forward, true, "db path");
 DEFINE_uint64(key, 0, "db path");
 
 using namespace std;

@@ -1,3 +1,7 @@
+#include <iostream>
+#include <string>
+#include <strstream>
+#include <fstream>
 #include <assert.h>
 #include <google/gflags.h>
 #include <glog/logging.h>
@@ -15,18 +19,26 @@ DEFINE_string(db, "", "db path");
 int main(int argc, char *argv[])
 {
   google::InitGoogleLogging(argv[0]);
-  google::ParseCommandLineFlags(&argc, &argv, true);
- 
-  for(int i = 0; i < argc; i++) {
-    printf("argv[%d] = \"%s\"\n", i, argv[i]);
+
+  char *home(getenv("HOME"));
+  if(home != NULL){
+    string option_file = string(home) + "/.gas";
+    FILE *fp = fopen(option_file.c_str(), "r");
+    if(fp != NULL){
+      fclose(fp);
+      google::ReadFromFlagsFile(option_file, "gas", false);
+    }
   }
-  assert(argc >= 1);
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  const vector<string> argvs = google::GetArgvs();
+
+  assert(argvs.size() >= 1);
 
   LOG(INFO) << "gas started";
   LOG(INFO) << "db is " << FLAGS_db << endl;
 
-  if(argv[1] == "db"){
-    db(argc, argv);
+  if(argvs[1] == "db"){
+    db();
   }else if(argv[1] == "edge"){
     //edge(argc, argv);
   }else if(argv[1] == "spp"){

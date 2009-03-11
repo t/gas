@@ -3,7 +3,7 @@
 
 #include <string>
 
-int db(int argc, char *argv[]);
+int db();
 
 #endif
 
