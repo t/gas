@@ -1,5 +1,6 @@
 #include <map>
 #include <set>
+#include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -13,7 +14,6 @@
 
 DECLARE_string(db);
 DEFINE_bool(forward, true, "db path");
-DEFINE_uint64(key, 0, "db path");
 
 using namespace std;
 using namespace boost;
@@ -36,6 +36,13 @@ int edge_init()
 
 int edge_select()
 {
+  LOG(INFO) << "edge_select is starting." << endl;
+
+  const vector<string> argvs = google::GetArgvs();
+  assert(argvs.size() >= 4);
+  
+  uint64_t key = lexical_cast<uint64_t>(argvs[3]);
+
   Btree<uint64_t, Edge> * btree;
   if(FLAGS_forward)
   {
@@ -44,18 +51,24 @@ int edge_select()
     btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, false);
   }
 
-  vector<Edge> result = btree->find(FLAGS_key);
-  cout << "count: " << result.size() << endl;
+  vector<Edge> result = btree->find(key);
+  cout << "result: " << endl;
+  cout << "  edge_count: "  << result.size() << endl;
+  cout << "  nodes: " << endl;
   for(vector<Edge>::iterator i = result.begin(); i < result.end(); i++)
   {
-    cout << (*i).to << endl;
+    cout << "    - "  << (*i).to << endl;
   }
 
   delete btree;
+
+  LOG(INFO) << "edge_select is complete." << endl;
 }
 
 int edge_insert()
 {
+  LOG(INFO) << "edge_insert is starting." << endl;
+
   Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  false);
   Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, false);
 
@@ -65,7 +78,7 @@ int edge_insert()
   while(getline(cin, str))
   {
     c++;
-    if(c % 10000 == 0) cout << c << endl;
+    if(c % 10000 == 0) LOG(INFO) << "edge_insert is inserting: " << c << " times" << endl;
 
     istrstream istrs((char *)str.c_str());
     int i = 0;
@@ -73,27 +86,22 @@ int edge_insert()
     while(istrs >> item)
     {
       istrstream istrs2((char *)item.c_str());
-      if(i == 0)
-      {
+      if(i == 0) {
         istrs2 >> f;
-      }else if(i == 1)
-      {
+      }else if(i == 1) {
         istrs2 >> t;
-      }else if(i == 2)
-      {
+      }else if(i == 2) {
         istrs2 >> w;
       }else{
         break;
       }
       i++;
     }
-    if(i == 2)
-    {
+    if(i == 2) {
       w = 1;
-      i++;
+      i++; 
     }
-    if(i == 3)
-    {
+    if(i == 3) {
       Edge fe;
       fe.key    = f;
       fe.to     = t;
@@ -107,11 +115,15 @@ int edge_insert()
       f_btree->insert(fe);
       b_btree->insert(be);
     }
-
   }
 
   delete f_btree;
   delete b_btree;
+
+  cout << "result: " << endl;
+  cout << "  edge_count: " << c << endl;
+
+  LOG(INFO) << "edge_insert is complete." << endl;
 }
 
 int edge_random()
@@ -263,5 +275,17 @@ int edge_from_count(const std::string& db_dir)
 }
 */
 
+int edge()
+{
+  const vector<string> argvs = google::GetArgvs();
+  assert(argvs.size() >= 3);
 
+  if(argvs[2] =="select"){
+    return edge_select();
+  }else if(argvs[2] == "insert"){
+    return edge_insert();
+  }
+
+  return 0;
+}
 

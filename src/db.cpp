@@ -29,6 +29,7 @@ int db_init()
   edge_init();
 
   LOG(INFO) << "db_init is complete." << endl;
+  return 1;
 }
 
 int db()
@@ -37,7 +38,8 @@ int db()
   assert(argvs.size() >= 2);
 
   if(argvs[2] =="init"){
-    db_init();
+    return db_init();
   }
+  return 0;
 }
 

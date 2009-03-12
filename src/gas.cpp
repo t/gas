@@ -34,21 +34,28 @@ int main(int argc, char *argv[])
 
   assert(argvs.size() >= 1);
 
-  LOG(INFO) << "gas started";
-  LOG(INFO) << "db is " << FLAGS_db << endl;
+  LOG(INFO) << "gas is starting";
+  LOG(INFO) << "db is [" << FLAGS_db << "]" << endl;
+  LOG(INFO) << "command is [" << argvs[1] << "]"<<  endl;
 
   if(argvs[1] == "db"){
     db();
-  }else if(argv[1] == "edge"){
-    //edge(argc, argv);
+  }else if(argvs[1] == "edge"){
+    edge();
+  }
+
+  /*
   }else if(argv[1] == "spp"){
     //spp(argc, argv);
   }else if(argv[1] == "pagerank"){
     //pagerank(argc, argv);
   }else if(argv[1] == "hits"){
     //hits(argc, argv);
+  }else{
+    cout << "Command Not Found [" << argvs[1] << "]" << endl;
   }
+  */
 
-  LOG(INFO) << "gas finished";
+  LOG(INFO) << "gas is complete";
 }
 

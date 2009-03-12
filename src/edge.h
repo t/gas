@@ -17,7 +17,7 @@ struct Edge{
 bool operator < (const Edge &e, const Edge &f);
 
 int edge_init();
-int edge(int argc, char *argv[]);
+int edge();
 
 #endif
 
