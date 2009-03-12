@@ -11,8 +11,8 @@
 #include "btree.h"
 #include "edge.h"
 #include "seq.h"
+#include "db.h"
 
-DECLARE_string(db);
 DEFINE_bool(forward, true, "db path");
 
 using namespace std;
@@ -25,8 +25,8 @@ bool operator < (const Edge &e, const Edge &f) {
 
 int edge_init()
 {
-  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  true);
-  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, true);
+  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  true);
+  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD), true);
 
   delete f_btree;
   delete b_btree;
@@ -46,19 +46,19 @@ int edge_select()
   Btree<uint64_t, Edge> * btree;
   if(FLAGS_forward)
   {
-    btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  false);
+    btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);
   }else{
-    btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, false);
+    btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD), false);
   }
 
   vector<Edge> result = btree->find(key);
   cout << "result: " << endl;
-  cout << "  edge_count: "  << result.size() << endl;
-  cout << "  nodes: " << endl;
+  cout << "  edges: " << endl;
   for(vector<Edge>::iterator i = result.begin(); i < result.end(); i++)
   {
-    cout << "    - "  << (*i).to << endl;
+    cout << "    - [" << (*i).key << ","  << (*i).to << "]" << endl;
   }
+  cout << "  edge_count: "  << result.size() << endl;
 
   delete btree;
 
@@ -69,8 +69,8 @@ int edge_insert()
 {
   LOG(INFO) << "edge_insert is starting." << endl;
 
-  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_FORWARD,  false);
-  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(FLAGS_db + '/' + FILE_EDGE_BACKWARD, false);
+  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);
+  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD), false);
 
   string str, item;
 
@@ -130,7 +130,7 @@ int edge_random()
 {
   srand(time(NULL));
 
-  const string seq_file = FLAGS_db + '/' + FILE_SEQUENCE;
+  const string seq_file = db_path(FILE_SEQUENCE);
   MmapVector<uint64_t> * seq = new MmapVector< uint64_t >(seq_file);
   seq->open(false);
 
@@ -140,140 +140,6 @@ int edge_random()
   seq->close();
   delete seq;
 }
-
-/*
-int edge_test(const std::string& db_dir)
-{
-  srand(0);
-  Btree<uint64_t, Edge> * btree;
-  btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_TEST, true);
-  map<uint64_t, int> counts;
-  for(uint64_t i = 0; i < 10000000000; i++){
-    if(i % 100000 == 0)
-    {
-      cout << "try: " << i / 100000 << " * 100000" << endl;
-    }
-
-    uint64_t s = rand() % 100;
-    uint64_t t = rand() % 100;
-
-    Edge e;
-    e.key    = s;
-    e.to     = t;
-    e.length = 1;
-
-    btree->insert(e);
-    vector<Edge> result = btree->find(s) ;
-
-    counts[s]++;
-    if(  result.size() != counts[s]  ) {
-      cout << "error " << counts[s] << endl;
-      break;
-    }
-  }
-  cout << "finish" << endl;
-
-  delete btree;
-}
-*/
-
-/*
-int edge_walker_test(const std::string& db_dir)
-{
-  Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
- 
-  ForwardWalker<uint64_t, Edge> walker = btree->walkerBegin();
-  while(! walker.is_end)
-  {
-    Edge value = walker.value();
-    cout << "forward key = " << value.key << " to = " << value.to << endl;
-
-    walker.increment();
-  }
-
-  delete btree;
-
-  btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD,  false);
-
-  walker = btree->walkerBegin();
-  while(! walker.is_end)
-  {
-    Edge value = walker.value();
-    cout << "backward key = " << value.key << " to = " << value.to << endl;
-    walker.increment();
-  }
-
-  delete btree;
-}
-
-int edge_iterator_test(const std::string& db_dir)
-{
-  Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
-
-  cout << "size = " << btree->size() << endl;
-
-  for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != btree->end(); i++)
-  {
-    Edge value = (*i);
-    cout << "forward key = " << value.key << " to = " << value.to << endl;
-  }
-
-  delete btree;
-
-}
-
-int edge_hadoop_adj_test(const std::string& db_dir)
-{
-  Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
-  size_t n = seq_size(db_dir, "testhash");
-  double edge_w = 1. / n;
-
-  ForwardWalker<uint64_t, Edge> walker = btree->walkerBegin();
-  uint64_t max_id = 0;
-  size_t i = 0;
-  while(! walker.is_end)
-  {
-    Edge value = walker.value();
-    if(i == 0 || value.key > max_id)
-    {
-      if(i > 0)
-      {
-        cout << endl;
-      }
-      max_id = value.key;
-      cout << max_id << " n:" << n << " s:" << edge_w;
-    }
-    cout << " o:" << value.to;
-
-    walker.increment();
-    i++;
-  }
-
-  delete btree;
-}
-*/
-
-/*
-int edge_from_count(const std::string& db_dir)
-{
-  Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
-
-  int count = 0;
-  uint64_t key = 0;
-  for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != btree->end(); i++)
-  {
-    Edge value = (*i);
-    if(value.key != key || count == 0){
-      key = value.key;
-      count++;
-    }
-  }
-
-  cout << "key count is " << count << endl;
-
-  delete btree;
-}
-*/
 
 int edge()
 {

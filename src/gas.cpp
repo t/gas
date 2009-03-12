@@ -34,14 +34,16 @@ int main(int argc, char *argv[])
 
   assert(argvs.size() >= 1);
 
-  LOG(INFO) << "gas is starting";
-  LOG(INFO) << "db is [" << FLAGS_db << "]" << endl;
+  LOG(INFO) << "gas started";
+  LOG(INFO) << "db is ["      << FLAGS_db << "]" << endl;
   LOG(INFO) << "command is [" << argvs[1] << "]"<<  endl;
 
   if(argvs[1] == "db"){
     db();
   }else if(argvs[1] == "edge"){
     edge();
+  }else if(argvs[1] == "spp"){
+    spp();
   }
 
   /*
@@ -56,6 +58,6 @@ int main(int argc, char *argv[])
   }
   */
 
-  LOG(INFO) << "gas is complete";
+  LOG(INFO) << "gas finished";
 }
 

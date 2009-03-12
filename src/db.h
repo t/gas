@@ -3,6 +3,7 @@
 
 #include <string>
 
+const std::string db_path(const std::string& filename);
 int db();
 
 #endif

@@ -2,16 +2,12 @@
 #include <queue>
 #include <algorithm>
 #include <map>
-#include <iostream>
 #include <string>
-#include <strstream>
-#include <fstream>
-#include <stdlib.h>
+#include <iostream>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdlib>
 #include <boost/program_options.hpp>
 
 using namespace std;
@@ -133,8 +129,8 @@ int main(int argc, char *argv[] )
   store(parse_command_line(argc, argv, opt), vm);
   notify(vm);
 
-  if( vm.count("help") ) {
-    cout << opt << endl; 
+  if(vm.count("help") ) {
+    cout << opt << endl;
     return 0;
   }
 
@@ -142,32 +138,38 @@ int main(int argc, char *argv[] )
   const string add     = vm["add"].as<string>();
   const string output  = vm["output"].as<string>();
 
-  string str, item;
-
-  while(getline(cin, str))
+  ssize_t read_size;
+  size_t buffer_size = 0;
+  char* buf;
+  const char * const delimiter = "\t";
+  while (-1 != (read_size = getline(&buf, &buffer_size, stdin)))
   {
-    istrstream istrs((char *)str.c_str());
-    int i = 0;
-    while(istrs >> item)
+    buf[read_size - 1] = '\0';  // remove 'newline'
+    char *s;
+    s = strtok(buf, delimiter);
+    int i=0;
+    while (s != NULL)
     {
-      if(i > 0)  cout << "\t";
-      if(i < n)
+      if (i > 0) printf("\t");
+      if (i < n)
       {
-        uint64_t hash = nhash(item.c_str(), item.size());
-        if(output == "hex")
-        {
-          cout << hex << hash;
-        }else{
-          cout << hash;
-        }
+        uint64_t hash = nhash(s, strlen(s));
+        if (output == "hex")
+          printf("%llx", hash);
+        else
+          printf("%llu", hash);
       }else{
-        cout << item;
+        printf("%s", s);
       }
-      i++;
+      s = strtok(NULL, delimiter);
+      ++i;
     }
-    if(add != "") cout << "\t" << add;
-    
-    cout << endl;
+    if (add != "") printf("\t%s\n", add.c_str());
+    else printf("\n");
   }
+
+  if (buf != NULL) free(buf);
+
+  return EXIT_SUCCESS;
 }
 

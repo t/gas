@@ -32,6 +32,12 @@ int db_init()
   return 1;
 }
 
+const string db_path(const string& filename)
+{
+  string ret = FLAGS_db + "/" + filename;
+  return ret;
+}
+
 int db()
 {
   const vector<string> argvs = google::GetArgvs();

@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <google/gflags.h>
+#include <glog/logging.h>
 
 template <class Heuristic> class QItem {
 public:
@@ -69,7 +71,7 @@ public:
      _trycount      = 0;
   }
 
-  bool next(VItem<Heuristic> &result, bool show_visit = false)
+  bool next(VItem<Heuristic> &result)
   {
      _trycount++;
 
@@ -82,8 +84,7 @@ public:
         typename std::map<uint64_t, VItem<Heuristic> >::iterator v = _visited.find(q.node);
         if(v != _visited.end()) continue;
 
-        if(show_visit)
-          std::cout << "visit\t" << q.node << std::endl;
+        LOG(INFO) << "shortestpath_tree visited [" << q.node << "]";
 
         ret = true;
         result = VItem<Heuristic>(q.node, q.parent, q.dist, q.hop);

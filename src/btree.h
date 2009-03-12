@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <boost/array.hpp>
 #include <boost/iterator_adaptors.hpp>
+#include <google/gflags.h>
+#include <glog/logging.h>
 
 #include "mmap_vector.h"
 
@@ -374,11 +376,7 @@ class Btree
 public:
   Btree(std::string filename, bool init)
   {
-    /*
-    std::cout << "B_STEM_POINT: " << BtreeNode<KEY, VALUE>::B_STEM_POINT << std::endl;
-    std::cout << "B_STEM_CHILD: " << BtreeNode<KEY, VALUE>::B_STEM_CHILD << std::endl;
-    std::cout << "B_STEM_DUMMY: " << BtreeNode<KEY, VALUE>::B_STEM_DUMMY << std::endl;
-    */
+    LOG(INFO) << "btree is opening [" << filename << "].";
 
     _tree = new MmapVector< BtreeNode<KEY, VALUE> >(filename);
     _tree->open(init);
