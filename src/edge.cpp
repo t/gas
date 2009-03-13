@@ -120,6 +120,8 @@ int edge_insert()
   delete f_btree;
   delete b_btree;
 
+  db_tmp_clear();
+
   cout << "result: " << endl;
   cout << "  edge_count: " << c << endl;
 
@@ -141,6 +143,21 @@ int edge_random()
   delete seq;
 }
 
+int edge_all()
+{ 
+  Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);
+
+  for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != btree->end(); i++)
+  {
+    Edge value = (*i);
+    cout << "forward key = " << value.key << " to = " << value.to << endl;
+  }
+
+  delete btree;
+
+  return 1;
+}
+
 int edge()
 {
   const vector<string> argvs = google::GetArgvs();
@@ -148,6 +165,8 @@ int edge()
 
   if(argvs[2] =="select"){
     return edge_select();
+  }else if(argvs[2] == "all"){
+    return edge_all();
   }else if(argvs[2] == "insert"){
     return edge_insert();
   }

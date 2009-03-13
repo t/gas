@@ -3,53 +3,44 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/array.hpp>
+#include <google/gflags.h>
+#include <glog/logging.h>
 
 #include "btree.h"
 #include "edge.h"
 #include "adjlist.h"
 #include "seq.h"
 #include "pagerank.h"
+#include "db.h"
 
-// FOR DEBUG
-#include <ctime>
+DEFINE_double(alpha,         0.15,      "Alpha");
+DEFINE_double(eps,           1.0e-8,    "Eps");
+DEFINE_int32 (max_iteration, 100,       "Max Iteration");
+DEFINE_int32 (free_interval, 500000000, "free_interval");
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
-template<typename T> int pagerank_t(const std::string& db_dir)
+template<typename T> int pagerank_calc_t()
 {
-  const string hash = "testhash";
-  const string adj_file      = db_dir + FILE_ADJLIST_FORWARD + hash;
-  const string seq_file      = db_dir + FILE_SEQUENCE        + hash;
-  const string pagerank_file = db_dir + FILE_PAGERANK        + hash;
+  LOG(INFO) << "pagerank_calc_t is starting." << endl;
 
-  seq_create(db_dir, hash);
+  const string adj_file      = db_path(FILE_ADJLIST_FORWARD);
+  const string seq_file      = db_path(FILE_SEQUENCE);
+  const string pagerank_file = db_path(FILE_PAGERANK);
+
+  seq_create();
 
   if(! exists(adj_file))
-  {
-    adjlist_create(db_dir, true, hash);
-  }
+    adjlist_create(true);
+
   if(! exists(adj_file)) return 0;
-
-// デバッグON！！！
-#define _DEBUG_
-
-  /** テストコードのため各種パラメータは定数で代用 **/
-  const double alpha = 0.15;       // 緩衝係数
-  const double eps = 1.0e-8;        // 許容誤差（収束判定用）
-  const int itr_upper_bound = 100; // 最大イテレーション回数
-  /**************************************************/
-
-#ifdef _DEBUG_
-  time_t start_time = time(0);
-  cout << "<start>" << endl;
-#endif
 
   MmapVector< T > * adj = new MmapVector< T >(adj_file);
   adj->open(false);
 
-  const uint64_t N = seq_size(db_dir, hash);
+  const uint64_t N = seq_size();
 
   // 転置隣接行列の取得（隣接リストとして）
   T *adjlist = adj->at(0);
@@ -61,22 +52,21 @@ template<typename T> int pagerank_t(const std::string& db_dir)
   double d, delta, pagerank_src, norm, pre_norm = 1.0;
   const uint64_t max_list_idx = adj->size();
 
-  for (;iteration_time<itr_upper_bound;++iteration_time) {
-    cout << "<" << time(0) - start_time << ">" << endl;
-    cout << "iteration " << iteration_time << endl;
+  for (;iteration_time < FLAGS_max_iteration; ++iteration_time) {
+    LOG(INFO) << "iteration " << iteration_time << endl;
 
     uint64_t list_idx = 0;
     uint64_t node_idx = 0;
-	// 各種パラメータの初期化
-	fill(tmp_vpr.begin(),tmp_vpr.end(),0.0);
-	norm = 0.0;
-	pagerank_src = 0.0;
 
-    const int free_interval = 500000000;
-    size_t free_next = free_interval;
+    // 各種パラメータの初期化
+    fill(tmp_vpr.begin(),tmp_vpr.end(),0.0);
+    norm = 0.0;
+    pagerank_src = 0.0;
+
+    size_t free_next = FLAGS_free_interval;
     while (list_idx<=max_list_idx) {
-	  // PageRank PAPER 2.6 Parameter E - calculation of pagerank_src will finish at the end of this loop
-	  pagerank_src += 1.0 * alpha / N * vpr[node_idx];
+      // PageRank PAPER 2.6 Parameter E - calculation of pagerank_src will finish at the end of this loop
+      pagerank_src += 1.0 * FLAGS_alpha / N * vpr[node_idx];
 
       const uint64_t forward_num = adjlist[list_idx];
       list_idx++;
@@ -86,8 +76,8 @@ template<typename T> int pagerank_t(const std::string& db_dir)
          continue;
       }
 
-      norm += vpr[node_idx] * (1.0 - alpha);
-      const double score = vpr[node_idx++] / forward_num * (1.0 - alpha);
+      norm += vpr[node_idx] * (1.0 - FLAGS_alpha);
+      const double score = vpr[node_idx++] / forward_num * (1.0 - FLAGS_alpha);
       const uint64_t border = list_idx + forward_num;
       while (list_idx < border)
       {
@@ -100,7 +90,7 @@ template<typename T> int pagerank_t(const std::string& db_dir)
         cout << "refresh" << endl;
         adj->refresh();
         adjlist = adj->at(0);
-        free_next += free_interval;
+        free_next += FLAGS_free_interval;
         /*
         adj->madv_dontneed(total_free_count, list_idx - total_free_count);
         total_free_count = list_idx;
@@ -117,9 +107,7 @@ template<typename T> int pagerank_t(const std::string& db_dir)
     d = pre_norm - norm;
     pre_norm = 0.0;
 
-#ifdef _DEBUG_
-    cout << "d = " << d << " pr_src = " << pagerank_src << endl;
-#endif
+    LOG(INFO) << "d = " << d << " pr_src = " << pagerank_src << endl;
 
     delta = 0.0;
     for (uint64_t i=0;i<N;++i) {
@@ -128,34 +116,23 @@ template<typename T> int pagerank_t(const std::string& db_dir)
       pre_norm += tmp_vpr[i];
     }
 
-#ifdef _DEBUG_
-    cout << "delta = " << delta << " norm = " << pre_norm << endl;
-#endif
+    LOG(INFO) << "delta = " << delta << " norm = " << pre_norm << endl;
 
     // judge finishing convergence
-    if (delta < eps) {
-#ifdef _DEBUG_
-		cout << "delta: " << delta << endl;
-		cout << "eps  : " << eps << endl;
-#endif
+    if (delta < FLAGS_eps) {
+      cout << "delta: " << delta << endl;
+      cout << "eps  : " << FLAGS_eps   << endl;
       iteration_time++;
       break;
     }
 
-    swap(vpr,tmp_vpr);
+    swap(vpr, tmp_vpr);
   }
-
-  cout << endl;
-  cout << ">>>>>>>>>>>>>>>>>" << endl;
-  cout << "RESULT" << endl;
-  cout << "<" << time(0) - start_time << ">" << endl;
-  cout << "Iter Time = " << iteration_time << endl;
 
   MmapVector<double> * pagerank = new MmapVector<double>(pagerank_file);
   pagerank->open(true);
   for(size_t i = 0; i < N; i++)
   {
-    cout << "i = " << vpr[i] << endl;
     pagerank->push_back(vpr[i]);
   }
   pagerank->close();
@@ -164,25 +141,57 @@ template<typename T> int pagerank_t(const std::string& db_dir)
   return 1;
 }
 
-int pagerank(const std::string& db_dir)
+int pagerank_select()
 {
-  const string hash = "testhash";
-  const string adj_file = db_dir + FILE_ADJLIST_FORWARD + hash;
-  const string seq_file = db_dir + FILE_SEQUENCE        + hash;
-  const string pagerank_file = db_dir + FILE_PAGERANK   + hash;
-  
-  if(boost::filesystem::exists(pagerank_file))
-  {
-    return 1;
+  const vector<string> argvs = google::GetArgvs();
+  assert(argvs.size() >= 3);
+
+
+}
+
+int pagerank_all()
+{
+  MmapVector<double> * pagerank = new MmapVector<double>(pagerank_file);
+  pagerank->open(false);
+  for(size_t i = 0; i < N; i++){
+  }
+  pagerank->close();
+  delete pagerank;
+}
+
+int pagerank()
+{
+  const vector<string> argvs = google::GetArgvs();
+  assert(argvs.size() >= 2);
+
+  const string adj_file      = db_path(FILE_ADJLIST_FORWARD);
+  const string seq_file      = db_path(FILE_SEQUENCE);
+  const string pagerank_file = db_path(FILE_PAGERANK);
+
+  if(argvs.size() == 2    ||
+     argvs[2] == "calc"   || 
+     argvs[2] == "select" ||
+     argvs[2] == "all"){ 
+
+     LOG(INFO) << "checking pagerank file [" << pagerank_file << "]." ;
+     if(! boost::filesystem::exists(pagerank_file)){
+       seq_create();
+       if(seq_32bit()) {
+         pagerank_calc_t<uint32_t>();
+       }else{
+         pagerank_calc_t<uint64_t>();
+       }
+     }else{
+       LOG(INFO) << "pagerank already computed.";
+     }
   }
 
-  seq_create(db_dir, hash);
-
-  if(seq_32bit(db_dir, hash))
-  {
-    pagerank_t<uint32_t>(db_dir);
-  }else{
-    pagerank_t<uint64_t>(db_dir);
+  if(argvs.size() == 2 || argvs[2] == "all"){
+    return pagerank_all();
+  }else if(argvs[2] == "select"){
+    return pagerank_select();
   }
+
+  return 0;
 }
 

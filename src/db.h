@@ -4,6 +4,7 @@
 #include <string>
 
 const std::string db_path(const std::string& filename);
+int db_tmp_clear();
 int db();
 
 #endif

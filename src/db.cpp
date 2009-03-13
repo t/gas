@@ -7,8 +7,12 @@
 #include <boost/filesystem/fstream.hpp>
 #include <google/gflags.h>
 #include <glog/logging.h>
+
 #include "db.h"
 #include "edge.h"
+#include "pagerank.h"
+#include "adjlist.h"
+#include "seq.h"
 
 DECLARE_string(db);
 
@@ -21,12 +25,28 @@ bool db_check()
   return true;
 }
 
+bool db_remove_file(const string & filename)
+{
+  const string filepath = db_path(filename);
+  LOG(INFO) << "Removing [" << filepath;
+  remove(filepath);
+}
+
+int db_tmp_clear()
+{
+  db_remove_file(FILE_PAGERANK);
+  db_remove_file(FILE_ADJLIST_FORWARD);
+  db_remove_file(FILE_ADJLIST_BACKWARD);
+  db_remove_file(FILE_SEQUENCE);
+}
+
 int db_init()
 {
   LOG(INFO) << "db_init is initializing [" << FLAGS_db << "]" << endl;
 
   create_directory(path(FLAGS_db));
   edge_init();
+  db_tmp_clear();
 
   LOG(INFO) << "db_init is complete." << endl;
   return 1;
@@ -45,6 +65,8 @@ int db()
 
   if(argvs[2] =="init"){
     return db_init();
+  }else if(argvs[2] == "tmp_clear"){
+    return db_tmp_clear();
   }
   return 0;
 }

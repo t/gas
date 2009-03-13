@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
     edge();
   }else if(argvs[1] == "spp"){
     spp();
+  }else if(argvs[1] == "pagerank"){
+    pagerank();
   }
 
   /*

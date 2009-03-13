@@ -3,29 +3,30 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <stdint.h>
+#include <google/gflags.h>
+#include <glog/logging.h>
 
 #include "btree.h"
 #include "edge.h"
 #include "seq.h"
+#include "db.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
-int seq_create(const string& db_dir, const string& hash)
+int seq_create()
 {
-  const string seq_file = db_dir + FILE_SEQUENCE + hash;
+  const string seq_file = db_path(FILE_SEQUENCE);
 
   if(boost::filesystem::exists(seq_file))
-  {
     return 1;
-  }
 
   MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
   seq->open(true);
 
-  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
-  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD, false);
+  Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);
+  Btree<uint64_t, Edge> * b_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD), false);
 
   ForwardWalker<uint64_t, Edge> f_walker = f_btree->walkerBegin();
   ForwardWalker<uint64_t, Edge> b_walker = b_btree->walkerBegin();
@@ -89,7 +90,6 @@ int seq_create(const string& db_dir, const string& hash)
 uint64_t seq_get(MmapVector< uint64_t > * seq, uint64_t hash)
 {
   uint64_t * a = seq->at(0);
-
   uint64_t * res = lower_bound(a, a + seq->size(), hash);
 
   assert( res != a + seq->size() );
@@ -110,9 +110,9 @@ uint64_t seq_get_random(MmapVector<uint64_t> * seq){
   return (* seq->at(r) );
 }
 
-size_t seq_size(const string& db_dir, const string& hash)
+size_t seq_size()
 {
-  const string seq_file = db_dir + FILE_SEQUENCE + hash;
+  const string seq_file = db_path(FILE_SEQUENCE);
 
   assert(boost::filesystem::exists(seq_file));
 
@@ -125,10 +125,9 @@ size_t seq_size(const string& db_dir, const string& hash)
   return seq_size;
 }
 
-bool seq_32bit(const string& db_dir, const string& hash)
+bool seq_32bit()
 {
-  size_t ret = seq_size(db_dir, hash);
-
+  size_t ret = seq_size();
   return (ret < 4294967296);
 }
 

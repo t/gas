@@ -5,7 +5,6 @@ gas_SOURCES  = src/gas.cpp \
                src/seq.cpp \
                src/adjlist.cpp \
                src/pagerank.cpp \
-               src/ipagerank.cpp \
                src/spp.cpp 
 gas_LDADD=-lboost_filesystem -lpthread -lgflags -lglog
 nhash_SOURCES=src/nhash.cpp

@@ -10,15 +10,16 @@
 #include "adjlist.h"
 #include "seq.h"
 #include "ielias_vector.h"
+#include "db.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
-template<typename T> int adjlist_create_t(const std::string& db_dir, bool is_forward, const std::string& hash)
+template<typename T> int adjlist_create_t(bool is_forward)
 {
-  const std::string seq_file = db_dir + FILE_SEQUENCE + hash;
-  const string adj_file = is_forward ? db_dir + FILE_ADJLIST_FORWARD + hash : db_dir + FILE_ADJLIST_BACKWARD;
+  const std::string seq_file = db_path(FILE_SEQUENCE);
+  const string adj_file = is_forward ? db_path(FILE_ADJLIST_FORWARD) : db_path(FILE_ADJLIST_BACKWARD);
 
   if(! exists(seq_file))
   {
@@ -35,9 +36,9 @@ template<typename T> int adjlist_create_t(const std::string& db_dir, bool is_for
   Btree<uint64_t, Edge> * btree;
   if(is_forward)
   {
-    btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
+    btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD), false);
   }else{
-    btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD,  false);
+    btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD),false);
   }
 
   ForwardWalker<uint64_t, Edge> walker = btree->walkerBegin();
@@ -81,17 +82,15 @@ template<typename T> int adjlist_create_t(const std::string& db_dir, bool is_for
   delete btree;
 }
 
-int adjlist_create(const std::string& db_dir,  bool is_forward, const std::string& hash)
+int adjlist_create(bool is_forward)
 {
-  const string adj_file = is_forward ? db_dir + FILE_ADJLIST_FORWARD + hash : db_dir + FILE_ADJLIST_BACKWARD;
-  const string seq_file = db_dir + FILE_SEQUENCE        + hash;
+  const string adj_file = is_forward ? db_path(FILE_ADJLIST_FORWARD) : db_path(FILE_ADJLIST_BACKWARD);
+  const string seq_file = db_path(FILE_SEQUENCE);
 
   if(boost::filesystem::exists(adj_file))
-  {
     return 1;
-  }
 
-  seq_create(db_dir, hash);
+  seq_create();
 
   MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
   seq->open(false);
@@ -101,21 +100,21 @@ int adjlist_create(const std::string& db_dir,  bool is_forward, const std::strin
 
   if(seq_size < 4294967296)
   {
-    adjlist_create_t<uint32_t>(db_dir, is_forward, hash);
+    adjlist_create_t<uint32_t>(is_forward);
   }else{
-    adjlist_create_t<uint64_t>(db_dir, is_forward, hash);
+    adjlist_create_t<uint64_t>(is_forward);
   }
 }
 
-int adjlist_ielias_create(const std::string& db_dir,  bool is_forward, const std::string& hash)
+int adjlist_ielias_create(bool is_forward)
 {
-  const string adj_file = is_forward ? db_dir + FILE_ADJLIST_IELIAS_FORWARD + hash : db_dir + FILE_ADJLIST_IELIAS_BACKWARD;
-  const string seq_file = db_dir + FILE_SEQUENCE + hash;
+  const string adj_file = is_forward ? db_path(FILE_ADJLIST_IELIAS_FORWARD) : db_path(FILE_ADJLIST_IELIAS_BACKWARD);
+  const string seq_file = db_path(FILE_SEQUENCE);
 
-  if(boost::filesystem::exists(adj_file)) {
+  if(boost::filesystem::exists(adj_file)) 
     return 1;
-  }
-  seq_create(db_dir, hash);
+
+  seq_create();
 
   MmapVector<uint64_t> * seq = new MmapVector<uint64_t>(seq_file);
   seq->open(false);
@@ -126,9 +125,9 @@ int adjlist_ielias_create(const std::string& db_dir,  bool is_forward, const std
   Btree<uint64_t, Edge> * btree;
   if(is_forward)
   {
-    btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_FORWARD,  false);
+    btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD), false);
   }else{
-    btree = new Btree<uint64_t, Edge>(db_dir + FILE_EDGE_BACKWARD,  false);
+    btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD), false);
   }
 
   ForwardWalker<uint64_t, Edge> walker = btree->walkerBegin();
@@ -176,9 +175,9 @@ int adjlist_ielias_create(const std::string& db_dir,  bool is_forward, const std
   delete btree;
 }
 
-int adjlist_ielias_test(const std::string& db_dir)
+int adjlist_ielias_test()
 {
-  const string test_file = db_dir + "elias_test";
+  const string test_file = db_path("elias_test");
 
   iEliasVector<uint64_t> * ielias = new iEliasVector<uint64_t>(test_file);
   ielias->open(true);

@@ -3,8 +3,8 @@
 
 #include <string>
 
-#define FILE_PAGERANK "tmp_pagerank_"
+#define FILE_PAGERANK "tmp_pagerank"
 
-int pagerank(const std::string& db_dir);
+int pagerank();
 
 #endif
