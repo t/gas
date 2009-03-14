@@ -150,7 +150,8 @@ int edge_all()
   cout << "result: " << endl;
   cout << "  edges: " << endl;
   size_t count = 0;
-  for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != btree->end(); i++)
+  Btree<uint64_t, Edge>::iterator end = btree->end();
+  for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != end; i++)
   {
     Edge value = (*i);
     cout << "    - [" << (*i).key << ","  << (*i).to << "]" << endl;

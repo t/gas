@@ -546,8 +546,12 @@ public:
       if(! walker.is_end)
       {
         walker.increment();
-        current = walker.value();
-        pos++;
+        if(walker.is_end){
+          is_end = true;
+        }else{
+          current = walker.value();
+          pos++;
+        }
       }else{
         is_end = true;
       }

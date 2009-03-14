@@ -51,8 +51,6 @@ int main(int argc, char *argv[])
   /*
   }else if(argv[1] == "spp"){
     //spp(argc, argv);
-  }else if(argv[1] == "pagerank"){
-    //pagerank(argc, argv);
   }else if(argv[1] == "hits"){
     //hits(argc, argv);
   }else{

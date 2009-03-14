@@ -131,8 +131,8 @@ template<typename T> int pagerank_calc_t()
 
     // judge finishing convergence
     if (delta < FLAGS_eps) {
-      cout << "delta: " << delta << endl;
-      cout << "eps  : " << FLAGS_eps   << endl;
+      LOG(INFO) << "delta: " << delta;
+      LOG(INFO) << "eps  : " << FLAGS_eps;
       iteration_time++;
       break;
     }
