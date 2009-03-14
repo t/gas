@@ -10,9 +10,6 @@
 
 #include "db.h"
 #include "edge.h"
-#include "pagerank.h"
-#include "adjlist.h"
-#include "seq.h"
 
 DECLARE_string(db);
 
@@ -25,19 +22,15 @@ bool db_check()
   return true;
 }
 
-bool db_remove_file(const string & filename)
-{
-  const string filepath = db_path(filename);
-  LOG(INFO) << "Removing [" << filepath;
-  remove(filepath);
-}
-
 int db_tmp_clear()
 {
-  db_remove_file(FILE_PAGERANK);
-  db_remove_file(FILE_ADJLIST_FORWARD);
-  db_remove_file(FILE_ADJLIST_BACKWARD);
-  db_remove_file(FILE_SEQUENCE);
+  directory_iterator end;
+  for(directory_iterator it(FLAGS_db); it != end; ++it){
+    if(it->leaf().substr(0, 4) == "tmp_"){
+      LOG(INFO) << "Removing [" << it->leaf() << "]";
+      remove(*it);
+    }
+  }
 }
 
 int db_init()
@@ -48,7 +41,7 @@ int db_init()
   edge_init();
   db_tmp_clear();
 
-  LOG(INFO) << "db_init is complete." << endl;
+  LOG(INFO) << "db_init finished." << endl;
   return 1;
 }
 

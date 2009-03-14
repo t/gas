@@ -147,14 +147,18 @@ int edge_all()
 { 
   Btree<uint64_t, Edge> * btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);
 
+  cout << "result: " << endl;
+  cout << "  edges: " << endl;
+  size_t count = 0;
   for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != btree->end(); i++)
   {
     Edge value = (*i);
-    cout << "forward key = " << value.key << " to = " << value.to << endl;
+    cout << "    - [" << (*i).key << ","  << (*i).to << "]" << endl;
+    count++;
   }
+  cout << "  edge_count: "  << count << endl;
 
   delete btree;
-
   return 1;
 }
 
