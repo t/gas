@@ -3,6 +3,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/array.hpp>
+#include <boost/lexical_cast.hpp>
 #include <google/gflags.h>
 #include <glog/logging.h>
 
@@ -22,13 +23,23 @@ using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
+const string pagerank_path()
+{
+  string ret = string(FILE_PAGERANK)
+             + "_alpha_" + lexical_cast<string>(FLAGS_alpha) 
+             + "_eps_"   + lexical_cast<string>(FLAGS_eps) 
+             + "_maxi_"  + lexical_cast<string>(FLAGS_max_iteration);
+
+  return db_path(ret);
+}
+
 template<typename T> int pagerank_calc_t()
 {
   LOG(INFO) << "pagerank_calc_t is starting." << endl;
 
   const string adj_file      = db_path(FILE_ADJLIST_FORWARD);
   const string seq_file      = db_path(FILE_SEQUENCE);
-  const string pagerank_file = db_path(FILE_PAGERANK);
+  const string pagerank_file = pagerank_path();
 
   seq_create();
 
@@ -141,22 +152,61 @@ template<typename T> int pagerank_calc_t()
   return 1;
 }
 
+int pagerank_all()
+{
+  const vector<string> argvs = google::GetArgvs();
+
+  const string pagerank_file = pagerank_path();
+  const string seq_file      = db_path(FILE_SEQUENCE);
+
+  const uint64_t N = seq_size();
+
+  MmapVector<double> * pagerank = new MmapVector<double>(pagerank_file);
+  pagerank->open(false);
+  MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
+  seq->open(false);
+
+  cout << "result:" << endl;
+  cout << "  pagerank:" << endl;
+  for(size_t i = 0; i < N; i++){
+    double * p = pagerank->at(i);
+    cout << "    " << (* seq->at(i) ) << ": " << (*p) << endl;
+  }
+
+  pagerank->close();
+  seq->close();
+  delete pagerank;
+  delete seq;
+}
+
 int pagerank_select()
 {
   const vector<string> argvs = google::GetArgvs();
-  assert(argvs.size() >= 3);
+  const string pagerank_file = pagerank_path();
+  const string seq_file      = db_path(FILE_SEQUENCE);
 
+  const uint64_t N = seq_size();
 
-}
+  assert(argvs.size() >= 4);
+  uint64_t key = lexical_cast<uint64_t>(argvs[3]);
 
-int pagerank_all()
-{
   MmapVector<double> * pagerank = new MmapVector<double>(pagerank_file);
   pagerank->open(false);
-  for(size_t i = 0; i < N; i++){
-  }
+  MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
+  seq->open(false);
+
+  uint64_t idx = seq_get(seq, key);
+
+  double * p = pagerank->at(idx);
+
+  cout << "result:" << endl;
+  cout << "  pagerank:" << endl;
+  cout << "    " << key << ": " << (*p) << endl;
+
   pagerank->close();
+  seq->close();
   delete pagerank;
+  delete seq;
 }
 
 int pagerank()
@@ -166,7 +216,7 @@ int pagerank()
 
   const string adj_file      = db_path(FILE_ADJLIST_FORWARD);
   const string seq_file      = db_path(FILE_SEQUENCE);
-  const string pagerank_file = db_path(FILE_PAGERANK);
+  const string pagerank_file = pagerank_path();
 
   if(argvs.size() == 2    ||
      argvs[2] == "calc"   || 
