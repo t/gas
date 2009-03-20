@@ -11,6 +11,7 @@
 #include "pagerank.h"
 #include "hits.h"
 #include "spp.h"
+#include "modularityq.h"
 
 using namespace std;
 
@@ -46,6 +47,8 @@ int main(int argc, char *argv[])
     spp();
   }else if(argvs[1] == "pagerank"){
     pagerank();
+  }else if(argvs[1] == "modularityq"){
+    modularityq();
   }
 
   /*

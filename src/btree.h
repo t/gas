@@ -463,7 +463,6 @@ public:
     assert(node->is_leaf);
     assert(walker->pos < node->count);
 
-    //std::cout << "walker: " << node_id << " - " << walker->pos << std::endl;
     return node->leaf.points[walker->pos];
   }
 
@@ -533,9 +532,10 @@ public:
     iterator(Btree<KEY, VALUE> * p) 
     {
       if(p){
-        walker = p->walkerBegin();
-        is_end = walker.is_end;
-        pos    = 0;
+        walker  = p->walkerBegin();
+        is_end  = walker.is_end;
+        pos     = 0;
+        current = walker.value();
       }else{
         is_end = true;
       }
