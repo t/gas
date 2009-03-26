@@ -9,13 +9,23 @@
 #include "adjlist.h"
 #include "seq.h"
 
-
-// FOR DEBUG
-#include <ctime>
+DEFINE_double(alpha,         0.15,      "Alpha");
+DEFINE_double(eps,           1.0e-8,    "Eps");
+DEFINE_int32 (max_iteration, 100,       "Max Iteration");
+DEFINE_int32 (free_interval, 500000000, "free_interval");
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
+
+const string hits_path()
+{
+  string ret = string(FILE_HITS)
+             + "_eps_"   + lexical_cast<string>(FLAGS_eps)
+             + "_maxi_"  + lexical_cast<string>(FLAGS_max_iteration);
+
+  return db_path(ret);
+}
 
 int hits (const std::string& db_dir)
 {
@@ -169,5 +179,41 @@ int hits (const std::string& db_dir)
 #endif
 
   return 1;
+}
+
+int hits()
+{
+  const vector<string> argvs = google::GetArgvs();
+  assert(argvs.size() >= 2);
+
+  const string adj_file  = db_path(FILE_ADJLIST_FORWARD);
+  const string seq_file  = db_path(FILE_SEQUENCE);
+  const string hits_file = pagerank_path();
+
+  if(argvs.size() == 2    ||
+     argvs[2] == "calc"   ||
+     argvs[2] == "select" ||
+     argvs[2] == "all"){
+
+     LOG(INFO) << "checking hits file [" << hits_file << "]." ;
+     if(! boost::filesystem::exists(hits_file)){
+       seq_create();
+       if(seq_32bit()) {
+         pagerank_calc_t<uint32_t>();
+       }else{
+         pagerank_calc_t<uint64_t>();
+       }
+     }else{
+       LOG(INFO) << "pagerank already computed.";
+     }
+  }
+
+  if(argvs.size() == 2 || argvs[2] == "all"){
+    return pagerank_all();
+  }else if(argvs[2] == "select"){
+    return pagerank_select();
+  }
+
+  return 0;
 }
 

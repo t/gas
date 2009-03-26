@@ -22,7 +22,7 @@ int seq_create()
   if(boost::filesystem::exists(seq_file))
     return 1;
 
-  MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
+  MmapVector<uint64_t> * seq = new MmapVector<uint64_t>(seq_file);
   seq->open(true);
 
   Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);

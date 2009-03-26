@@ -8,10 +8,10 @@
 
 #include "db.h"
 #include "edge.h"
-#include "pagerank.h"
-#include "hits.h"
 #include "spp.h"
 #include "modularityq.h"
+#include "adjlist.h"
+#include "pagerank.h"
 
 using namespace std;
 
@@ -43,23 +43,15 @@ int main(int argc, char *argv[])
     db();
   }else if(argvs[1] == "edge"){
     edge();
+  }else if(argvs[1] == "adjlist"){
+    adjlist();
   }else if(argvs[1] == "spp"){
     spp();
-  }else if(argvs[1] == "pagerank"){
-    pagerank();
   }else if(argvs[1] == "modularityq"){
     modularityq();
+  }else if(argvs[1] == "pagerank"){
+    pagerank();
   }
-
-  /*
-  }else if(argv[1] == "spp"){
-    //spp(argc, argv);
-  }else if(argv[1] == "hits"){
-    //hits(argc, argv);
-  }else{
-    cout << "Command Not Found [" << argvs[1] << "]" << endl;
-  }
-  */
 
   LOG(INFO) << "gas finished";
 }

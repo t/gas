@@ -111,12 +111,10 @@ class Btree
     if(kd != 0 && node_id == (* root)) return;
     node = _tree->at(node_id);
 
-    // 探索
     if(! node->is_leaf)
     {		
       int move = this->low_in_stem(e.key, node_id);
  
-      // 再帰処理
       next = node->stem.children[move];
       if(is_full(next))
       {
@@ -142,7 +140,6 @@ class Btree
         }
       }
 
-      // Leafに達した場合は挿入
       for(int i = 0; i < node->count; i++)
       {
         int move_from = lower + (node->count - 1 - i);
@@ -167,7 +164,6 @@ class Btree
     if(kd != 0 && node_id == (* r)) return 0;
     node = _tree->at(node_id);
       
-    // 再帰処理
     if(! node->is_leaf)
     {
       int move = this->low_in_stem(s, node_id);
@@ -184,7 +180,6 @@ class Btree
         }
       }
     }else{
-      // 発見処理
       for(int i = 0; i < node->count; i++)
       {
         // cout << "finding... : " << i << endl;
@@ -210,7 +205,6 @@ class Btree
     if(kd != 0 && node_id == (* r)) return 0;
     node = _tree->at(node_id);
 
-    // 再帰処理
     if(! node->is_leaf)
     {
       int move = this->low_in_stem(e.key, node_id);
@@ -227,7 +221,7 @@ class Btree
         }
       }
     }else{
-      // 削除処理
+      // remove
       int delete_start = node->count;
       int delete_end   = node->count;
       for(int i = 0; i < node->count; i++)
@@ -261,7 +255,6 @@ class Btree
     if(kd != 0 && node_id == (* r)) return ;
     node = _tree->at(node_id);
 
-    // 再帰処理
     if(! node->is_leaf)
     {
       for(int i = 0; i <= node->count; i++)
@@ -311,7 +304,7 @@ class Btree
     int    point_min;
     int    point_max;
 
-    // 新しいノードを作成する
+    // create a new node
 
     split = _tree->at(split_id);
 
@@ -319,7 +312,7 @@ class Btree
     new_node    = _tree->back();
     new_node_id = _tree->size() - 1;
 
-    // 分割する
+    // split the node
 
     split = _tree->at(split_id);
 
@@ -351,7 +344,7 @@ class Btree
         new_node->stem.children[i] = split->stem.children[point_min + i + 1];
     }
 
-    // 親を更新する
+    // update parent
 
     parent = _tree->at(parent_id);
 
@@ -417,7 +410,6 @@ public:
 
   void insert(const VALUE& e)
   {
-    // Rootが満杯の時は分割する
     int64_t * r = _tree->header(0);
     if(is_full((* r)))
     {

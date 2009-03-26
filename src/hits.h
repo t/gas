@@ -3,6 +3,8 @@
 
 #include <string>
 
-int hits(const std::string& db_dir);
+#define FILE_HITS "tmp_hits"
+
+int hits();
 
 #endif

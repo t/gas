@@ -188,6 +188,50 @@ class MmapVector
       //madvise(_body_start + index * sizeof(T), count * sizeof(T), MADV_DONTNEED);
     }
 
+    struct iterator : boost::iterator_facade<iterator, T, boost::forward_traversal_tag>
+    {
+      MmapVector<T> * parent;
+      size_t          pos;
+
+      iterator(){}
+      iterator(MmapVector<T> * p)
+      {
+        parent = p;
+        pos    = 0;
+      }
+
+      bool is_end() const
+      {
+        if(parent == NULL) return true;
+        return (pos >= parent->size());
+      }
+
+      void increment()
+      {
+        if(! is_end()) pos++;
+      }
+
+      bool equal(iterator const& other) const
+      {
+        if(is_end() && other.is_end()) return true;
+        if(!is_end() && !other.is_end() && pos == other.pos) return true;
+        return false;
+      }
+
+      T& dereference() const
+      {
+        (* parent->at(pos));
+        return (* parent->at(pos));
+      }
+    };
+    iterator begin()
+    {
+      return iterator(this);
+    }
+    iterator end()
+    {
+      return iterator(NULL);
+    }
 };
 
 #endif
