@@ -53,7 +53,16 @@ int Adjlist::create(){
   assert(subject_ == NULL);
   subject_ = adjlist_fixed_create(forward_); 
   subject_->create();
-  subject_->open();
+}
+
+int Adjlist::open(){
+  assert(subject_ != NULL);
+  return subject_->open();
+}
+
+int Adjlist::close(){
+  assert(subject_ != NULL);
+  return subject_->close();
 }
 
 Adjlist::iterator Adjlist::begin()

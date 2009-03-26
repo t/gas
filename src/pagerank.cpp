@@ -46,6 +46,7 @@ int pagerank_calc()
   LOG(INFO) << "pagerank_calc_t is starting." << endl;
 
   Adjlist adj = adjlist_create(true);
+  adj.open();
 
   uint64_t node_count = (* adj.begin() );
 
@@ -103,6 +104,8 @@ int pagerank_calc()
 
     swap(vpr, tmp_vpr);
   }
+
+  adj.close();
 
   MmapVector<double> * pagerank = new MmapVector<double>(pagerank_file);
   pagerank->open(true);

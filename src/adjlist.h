@@ -45,6 +45,8 @@ public:
   Adjlist(bool forward);
   ~Adjlist();
   int create();
+  int open();
+  int close();
   iterator begin();
   iterator end();
   AbstractAdjlist * subject_;

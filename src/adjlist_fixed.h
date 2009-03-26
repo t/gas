@@ -45,11 +45,15 @@ public:
   int create()
   {
     LOG(INFO) << "AdjlistFixed::create"; 
- 
-    seq_create();
-    const std::string adj_file = adjlist_fixed_path(seq_32bit(), forward_);
-    const std::string seq_file = db_path(FILE_SEQUENCE);
 
+    const std::string seq_file = db_path(FILE_SEQUENCE);
+    const std::string adj_file = adjlist_fixed_path(seq_32bit(), forward_);
+
+    seq_create();
+
+    if(boost::filesystem::exists(adj_file))
+      return 1;
+ 
     MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
     seq->open(false);
 
