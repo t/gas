@@ -8,6 +8,7 @@ gas_SOURCES  = src/gas.cpp \
                src/adjlist_ielias.cpp \
                src/spp.cpp \
                src/pagerank.cpp \
+               src/hits.cpp \
                src/modularityq.cpp 
 gas_LDADD=-lboost_filesystem -lpthread -lgflags -lglog
 nhash_SOURCES=src/nhash.cpp

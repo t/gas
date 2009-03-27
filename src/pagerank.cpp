@@ -119,7 +119,7 @@ int pagerank_calc()
   return 1;
 }
 
-int pagerank_all()
+int pagerank_show()
 {
   const vector<string> argvs = google::GetArgvs();
 
@@ -135,40 +135,19 @@ int pagerank_all()
 
   cout << "result:" << endl;
   cout << "  pagerank:" << endl;
-  for(size_t i = 0; i < N; i++){
-    double * p = pagerank->at(i);
-    cout << "    " << (* seq->at(i) ) << ": " << (*p) << endl;
+
+  if(argvs.size() == 2 || argvs[2] == "" || argvs[2] == "all"){
+    for(size_t i = 0; i < N; i++){
+      double * p = pagerank->at(i);
+      cout << "    " << (* seq->at(i) ) << ": " << (*p) << endl;
+    }
+  }else if(argvs[2] == "select"){
+    assert(argvs.size() >= 4);
+    uint64_t key = lexical_cast<uint64_t>(argvs[3]);
+    uint64_t idx = seq_get(seq, key);
+    double * p = pagerank->at(idx);
+    cout << "    " << key << ": " << (*p) << endl;
   }
-
-  pagerank->close();
-  seq->close();
-  delete pagerank;
-  delete seq;
-}
-
-int pagerank_select()
-{
-  const vector<string> argvs = google::GetArgvs();
-  const string pagerank_file = pagerank_path();
-  const string seq_file      = db_path(FILE_SEQUENCE);
-
-  const uint64_t N = seq_size();
-
-  assert(argvs.size() >= 4);
-  uint64_t key = lexical_cast<uint64_t>(argvs[3]);
-
-  MmapVector<double> * pagerank = new MmapVector<double>(pagerank_file);
-  pagerank->open(false);
-  MmapVector< uint64_t > * seq = new MmapVector< uint64_t >(seq_file);
-  seq->open(false);
-
-  uint64_t idx = seq_get(seq, key);
-
-  double * p = pagerank->at(idx);
-
-  cout << "result:" << endl;
-  cout << "  pagerank:" << endl;
-  cout << "    " << key << ": " << (*p) << endl;
 
   pagerank->close();
   seq->close();
@@ -181,20 +160,9 @@ int pagerank()
   const vector<string> argvs = google::GetArgvs();
   assert(argvs.size() >= 2);
 
-  if(argvs.size() == 2    ||
-     argvs[2] == "calc"   || 
-     argvs[2] == "select" ||
-     argvs[2] == "all"){ 
+  pagerank_calc();
+  pagerank_show();
 
-    pagerank_calc();
-  }
-
-  if(argvs.size() == 2 || argvs[2] == "all"){
-    return pagerank_all();
-  }else if(argvs[2] == "select"){
-    return pagerank_select();
-  }
-
-  return 0;
+  return 1;
 }
 

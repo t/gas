@@ -2,6 +2,7 @@
 #include <string>
 #include <strstream>
 #include <fstream>
+#include <vector>
 #include <assert.h>
 #include <google/gflags.h>
 #include <glog/logging.h>
@@ -12,6 +13,7 @@
 #include "modularityq.h"
 #include "adjlist.h"
 #include "pagerank.h"
+#include "hits.h"
 
 using namespace std;
 
@@ -32,9 +34,7 @@ int main(int argc, char *argv[])
     }
   }
   google::ParseCommandLineFlags(&argc, &argv, true);
-  const vector<string> argvs = google::GetArgvs();
-
-  assert(argvs.size() >= 1);
+  vector<string> argvs = google::GetArgvs();
 
   LOG(INFO) << "gas started";
   LOG(INFO) << "db is ["      << FLAGS_db << "]" << endl;
@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
     modularityq();
   }else if(argvs[1] == "pagerank"){
     pagerank();
+  }else if(argvs[1] == "hits"){
+    hits();
   }
 
   LOG(INFO) << "gas finished";
