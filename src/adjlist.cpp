@@ -1,12 +1,17 @@
 #include <boost/iterator_adaptors.hpp>
 #include <boost/shared_ptr.hpp>
+#include <google/gflags.h>
+#include <glog/logging.h>
 
 #include "btree.h"
 #include "edge.h"
 #include "adjlist.h"
 #include "adjlist_fixed.h"
+#include "adjlist_ielias.h"
 #include "seq.h"
 #include "db.h"
+
+DEFINE_string(adjlist, "fixed", "Adjlist Type");
 
 using namespace std;
 
@@ -51,7 +56,13 @@ Adjlist::~Adjlist(){
 int Adjlist::create(){
   LOG(INFO) << "Adjlist::create()";
   assert(subject_ == NULL);
-  subject_ = adjlist_fixed_create(forward_); 
+
+  if(FLAGS_adjlist == "fixed"){
+    subject_ = adjlist_fixed_create(forward_); 
+  }else if(FLAGS_adjlist == "ielias"){
+    subject_ = adjlist_ielias_create(forward_);
+  }
+
   subject_->create();
 }
 
@@ -87,16 +98,20 @@ Adjlist adjlist_create(bool forward)
 int adjlist_all()
 {
   Adjlist adj = adjlist_create(true);
+  adj.open();
 
   Adjlist::iterator end = adj.end();
+
   cout << "result:" << endl;
   cout << "  adjlist:" << endl;
-  size_t count = 0;
-  for(Adjlist::iterator i = adj.begin(); i != end; i++){
+  size_t count = 0; 
+ for(Adjlist::iterator i = adj.begin(); i != end; i++){
     cout << "    " << count << ": " << (*i) << endl;
     count++;
   }
   cout << "  adjlist_count: " << count << endl;
+
+  adj.close();
 }
 
 int adjlist()

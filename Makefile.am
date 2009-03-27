@@ -5,6 +5,7 @@ gas_SOURCES  = src/gas.cpp \
                src/seq.cpp \
                src/adjlist.cpp \
                src/adjlist_fixed.cpp \
+               src/adjlist_ielias.cpp \
                src/spp.cpp \
                src/pagerank.cpp \
                src/modularityq.cpp 

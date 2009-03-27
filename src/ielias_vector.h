@@ -128,6 +128,7 @@ public:
     mutable T current;
     iEliasVector<T> * parent;
 
+    iterator(){};
     iterator(iEliasVector<T> * p)
     {
       if(p){

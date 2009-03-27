@@ -47,10 +47,9 @@ public:
     LOG(INFO) << "AdjlistFixed::create"; 
 
     const std::string seq_file = db_path(FILE_SEQUENCE);
-    const std::string adj_file = adjlist_fixed_path(seq_32bit(), forward_);
-
     seq_create();
 
+    const std::string adj_file = adjlist_fixed_path(seq_32bit(), forward_);
     if(boost::filesystem::exists(adj_file))
       return 1;
  
