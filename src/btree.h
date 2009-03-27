@@ -132,8 +132,7 @@ class Btree
       for(int i = 0; i < node->count; i++)
       {
         VALUE item = node->leaf.points[i];
-        KEY   source = item.key;
-        if( source > e.key)
+        if( e < item )
         {
           lower = i;
           break;

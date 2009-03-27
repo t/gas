@@ -16,6 +16,7 @@
 using namespace std;
 
 DEFINE_string(db, "", "db path");
+DEFINE_bool(tmp_clear, false, "tmp_clear");
 
 int main(int argc, char *argv[])
 {
@@ -38,6 +39,10 @@ int main(int argc, char *argv[])
   LOG(INFO) << "gas started";
   LOG(INFO) << "db is ["      << FLAGS_db << "]" << endl;
   LOG(INFO) << "command is [" << argvs[1] << "]"<<  endl;
+
+  if(FLAGS_tmp_clear){
+    db_tmp_clear();
+  }
 
   if(argvs[1] == "db"){
     db();
