@@ -28,7 +28,6 @@ int init_arg(int argc, char *argv[])
   for(int i = 0; i < argc; i++){
     g_argvs.push_back( string(argv[i]) );
   }
-
 }
 
 vector<string>& get_argvs()

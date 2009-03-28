@@ -13,6 +13,7 @@
 #include "seq.h"
 #include "hits.h"
 #include "db.h"
+#include "arg.h"
 
 /*
 DEFINE_double(alpha,         0.15,      "Alpha");
@@ -138,7 +139,7 @@ int hits_calc()
 
 int hits_show()
 {
-  const vector<string> argvs = google::GetArgvs();
+  const vector<string> argvs = get_argvs();
 
   const string hits_file = hits_path();
   const string seq_file  = db_path(FILE_SEQUENCE);
@@ -174,7 +175,7 @@ int hits_show()
 
 int hits()
 {
-  const vector<string> argvs = google::GetArgvs();
+  const vector<string> argvs = get_argvs();
   assert(argvs.size() >= 2);
 
   hits_calc();
