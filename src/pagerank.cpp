@@ -13,6 +13,7 @@
 #include "seq.h"
 #include "pagerank.h"
 #include "db.h"
+#include "arg.h"
 
 DEFINE_double(alpha,         0.15,      "Alpha");
 DEFINE_double(eps,           1.0e-8,    "Eps");
@@ -121,7 +122,7 @@ int pagerank_calc()
 
 int pagerank_show()
 {
-  const vector<string> argvs = google::GetArgvs();
+  const vector<string> argvs = get_argvs();
 
   const string pagerank_file = pagerank_path();
   const string seq_file      = db_path(FILE_SEQUENCE);
@@ -157,7 +158,7 @@ int pagerank_show()
 
 int pagerank()
 {
-  const vector<string> argvs = google::GetArgvs();
+  const vector<string> argvs = get_argvs();
   assert(argvs.size() >= 2);
 
   pagerank_calc();

@@ -14,6 +14,7 @@
 #include "adjlist.h"
 #include "pagerank.h"
 #include "hits.h"
+#include "arg.h"
 
 using namespace std;
 
@@ -23,18 +24,8 @@ DEFINE_bool(tmp_clear, false, "tmp_clear");
 int main(int argc, char *argv[])
 {
   google::InitGoogleLogging(argv[0]);
-
-  char *home(getenv("HOME"));
-  if(home != NULL){
-    string option_file = string(home) + "/.gas";
-    FILE *fp = fopen(option_file.c_str(), "r");
-    if(fp != NULL){
-      fclose(fp);
-      google::ReadFromFlagsFile(option_file, "gas", false);
-    }
-  }
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  vector<string> argvs = google::GetArgvs();
+  init_arg(argc, argv);
+  vector<string> argvs = get_argvs();
 
   LOG(INFO) << "gas started";
   LOG(INFO) << "db is ["      << FLAGS_db << "]" << endl;
