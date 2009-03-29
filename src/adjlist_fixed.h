@@ -68,19 +68,14 @@ public:
       btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_BACKWARD),false);
     }
 
-    uint64_t key = 0;
     Btree<uint64_t, Edge>::iterator end = btree->end();
-    for(Btree<uint64_t, Edge>::iterator i = btree->begin(); i != end; i++){
+    Btree<uint64_t, Edge>::iterator i = btree->begin();
+    while(i != end){
       std::vector<uint64_t> links;
-      while(i != end)
-      {
-        if(i->key == key) {
-          links.push_back(i->to);
-          i++;
-        }else{
-          key = i->key;
-          break;
-        }
+      uint64_t key = i->key;
+      while(i != end && i->key == key){
+        links.push_back(i->to);
+        i++;
       }
       adj->push_back(links.size());
       for(typename std::vector<uint64_t>::iterator j = links.begin(); j != links.end(); j++){

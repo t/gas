@@ -51,6 +51,8 @@ int pagerank_calc()
 
   uint64_t node_count = (* adj.begin() );
 
+  LOG(INFO) << "node_count = " << node_count;
+
   vector<double> vpr(node_count,  1. / node_count);
 
   double d, delta, pagerank_src, norm, pre_norm = 1.0;
@@ -63,18 +65,22 @@ int pagerank_calc()
 
     size_t node_i = 0;
     Adjlist::iterator adj_last = adj.end();
-    for(Adjlist::iterator adj_i = adj.begin() + 1; adj_i != adj_last; adj_i++){
+    int x = 0;
+    for(Adjlist::iterator adj_i = adj.begin() + 1; adj_i != adj_last; ++adj_i){
+      LOG(INFO) << "adj:x =" << x; x++;
       // PageRank PAPER 2.6 Parameter E - calculation of pagerank_src will finish at the end of this loop
       pagerank_src += 1.0 * FLAGS_alpha / node_count * vpr[node_i];
 
       norm += vpr[node_i] * (1.0 - FLAGS_alpha);
+      LOG(INFO) << node_i << ", norm = " << norm;
       const uint64_t edge_count = (*adj_i);
       const double   score      = vpr[node_i] / edge_count * (1.0 - FLAGS_alpha);
+      LOG(INFO) << "edge_count = " << edge_count;
       for(size_t i = 0; i < edge_count; i++){
-        adj_i++;
+        ++adj_i;
         tmp_vpr[(*adj_i)] += score;
       }
-      node_i++;
+      ++node_i;
     }
 
     norm        += pagerank_src;
@@ -87,13 +93,13 @@ int pagerank_calc()
     LOG(INFO) << "d = " << d << " pr_src = " << pagerank_src << endl;
 
     delta = 0.0;
-    for(size_t i = 0;  i< node_count; ++i) {
+    for(size_t i = 0;  i < node_count; ++i) {
       tmp_vpr[i] += pagerank_src + 1.0 / node_count * d;
       delta      += fabs(tmp_vpr[i] - vpr[i]);
       pre_norm   += tmp_vpr[i];
     }
 
-    LOG(INFO) << "delta = " << delta << " norm = " << pre_norm << endl;
+    LOG(INFO) << "delta = " << delta << " pre_norm = " << pre_norm << endl;
 
     // judge finishing convergence
     if (delta < FLAGS_eps) {
