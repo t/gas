@@ -67,15 +67,12 @@ int pagerank_calc()
     Adjlist::iterator adj_last = adj.end();
     int x = 0;
     for(Adjlist::iterator adj_i = adj.begin() + 1; adj_i != adj_last; ++adj_i){
-      LOG(INFO) << "adj:x =" << x; x++;
       // PageRank PAPER 2.6 Parameter E - calculation of pagerank_src will finish at the end of this loop
       pagerank_src += 1.0 * FLAGS_alpha / node_count * vpr[node_i];
 
       norm += vpr[node_i] * (1.0 - FLAGS_alpha);
-      LOG(INFO) << node_i << ", norm = " << norm;
       const uint64_t edge_count = (*adj_i);
       const double   score      = vpr[node_i] / edge_count * (1.0 - FLAGS_alpha);
-      LOG(INFO) << "edge_count = " << edge_count;
       for(size_t i = 0; i < edge_count; i++){
         ++adj_i;
         tmp_vpr[(*adj_i)] += score;
