@@ -19,6 +19,16 @@ using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 
+template<typename Heuristic> void push_path(ShortestpathTree<Heuristic> & spt, uint64_t start, uint64_t target, vector<uint64_t> & path)
+{
+  uint64_t current = target;
+  while(true){
+    path.push_back(current);
+    if(current == start) break;
+    current = spt.parent(current);
+  }
+}
+
 template<typename Heuristic> int unidirectional_t(uint64_t start, uint64_t target, Heuristic * fwd_h)
 {
   Btree<uint64_t, Edge> * f_btree = new Btree<uint64_t, Edge>(db_path(FILE_EDGE_FORWARD),  false);
@@ -35,7 +45,19 @@ template<typename Heuristic> int unidirectional_t(uint64_t start, uint64_t targe
       break;
     }
   }
-  cout << "meet?= " << meet << " count = " << i << endl;
+  cout << "result:" << endl;
+  cout << "  found: " << meet << endl;
+  cout << "  iteration: " << i << endl;
+
+  if(meet){
+    vector<uint64_t> path;
+    push_path(spt_fwd, start, target, path);
+    reverse(path.begin(), path.end());
+    cout << "  path:" << endl;
+    for(vector<uint64_t>::iterator i = path.begin(); i != path.end(); ++i){
+      cout << "    - " << (*i) << endl;
+    } 
+  }
 
   delete f_btree;
   if(meet) return i;
@@ -56,6 +78,7 @@ template<typename Heuristic> int bidirectional_t(uint64_t start, uint64_t target
   VItem<Heuristic> visit;
   bool meet = false;
   int i = 0;
+  uint64_t meet_node = 0;
   while(! meet)
   { 
     i++;
@@ -65,12 +88,31 @@ template<typename Heuristic> int bidirectional_t(uint64_t start, uint64_t target
     if(! spt_a->next(visit) ) break;
 
     meet = spt_b->scaned(visit.node);
+    if(meet) meet_node = visit.node;
   }
   LOG(INFO) << "bidirectional_t finished" << endl;
 
   cout << "result: " << endl;
-  cout << "  meet: "  << meet << endl;
-  cout << "  search_space: " << i << endl;
+  cout << "  found: "  << meet << endl;
+  cout << "  iteration: " << i << endl;
+
+  if(meet){
+    vector<uint64_t> path_fwd;
+    vector<uint64_t> path_rev;
+    push_path(spt_fwd, start,  meet_node, path_fwd);
+    push_path(spt_rev, target, meet_node, path_rev);
+    reverse(path_fwd.begin(), path_fwd.end());
+    cout << "  path:" << endl;
+    for(vector<uint64_t>::iterator i = path_fwd.begin(); i != path_fwd.end(); ++i){
+      cout << "    - " << (*i) << endl;
+    }
+    for(vector<uint64_t>::iterator i = path_rev.begin(); i != path_rev.end(); ++i){
+      if((*i) != meet_node){
+        cout << "    - " << (*i) << endl;
+      }
+    }
+
+  }
 
   delete f_btree;
   delete b_btree;
