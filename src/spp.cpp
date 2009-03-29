@@ -12,9 +12,6 @@
 #include "db.h"
 #include "shortestpath_tree.h"
 #include "dijkstra_heuristic.h"
-#include "alt_heuristic.h"
-#include "alt_precompute.h"
-#include "malt_heuristic.h"
 
 DEFINE_string(directional, "bi", "directional");
 
@@ -93,61 +90,6 @@ int bidirectional_dijkstra(uint64_t start, uint64_t target)
   DijkstraHeuristic h;
   return bidirectional_t<DijkstraHeuristic>(start, target, &h, &h);
 }
-
-/*
-int bidirectional_alt(uint64_t start, uint64_t target, 
-                      const std::string& landmark_strategy, const int& landmark_size)
-{
-  const string pre_file = db_dir + "tmp_alt_" + landmark_strategy + "_" + lexical_cast<string>(landmark_size);
-
-  if(! exists(pre_file) ){
-    alt_precompute(db_dir, landmark_strategy, landmark_size);
-  }
-
-  Btree<uint64_t, LandmarkDist> * alt_btree = new Btree<uint64_t, LandmarkDist>(pre_file, false);
-
-  AltHeuristic fwd_h(true,  alt_btree);
-  AltHeuristic rev_h(false, alt_btree);
-
-  int result = bidirectional_t<AltHeuristic>(db_dir, start, target, &fwd_h, &rev_h);
-
-  delete alt_btree;
-  return result;
-}
-
-int bidirectional_malt(uint64_t start, uint64_t target, const std::string& strategy, const int& landmark_size)
-{
-  const string pre2_file = db_dir + "tmp_malt_" + strategy + "_" + lexical_cast<string>(landmark_size);
-  const string pre3_file = db_dir + "tmp_malt_landmark_" + strategy + "_" + lexical_cast<string>(landmark_size);
-  Btree<uint64_t, LandmarkDist> * malt_btree     = new Btree<uint64_t, LandmarkDist>(pre2_file, false);
-  Btree<uint64_t, LandmarkDist> * landmark_btree = new Btree<uint64_t, LandmarkDist>(pre3_file, false);
-
-  MaltHeuristic fwd_h(true,  true, malt_btree, landmark_btree);
-  MaltHeuristic rev_h(false, true, malt_btree, landmark_btree);
-
-  int result = bidirectional_t<MaltHeuristic>(db_dir, start, target, &fwd_h, &rev_h);
-
-  delete malt_btree;
-  delete landmark_btree;
-  return result;
-}
-
-int unidirectional_malt(uint64_t start, uint64_t target, const std::string& strategy, const int& landmark_size)
-{
-  const string pre2_file = db_dir + "tmp_malt_" + strategy + "_" + lexical_cast<string>(landmark_size);
-  const string pre3_file = db_dir + "tmp_malt_landmark_" + strategy + "_" + lexical_cast<string>(landmark_size);
-  Btree<uint64_t, LandmarkDist> * malt_btree     = new Btree<uint64_t, LandmarkDist>(pre2_file, false);
-  Btree<uint64_t, LandmarkDist> * landmark_btree = new Btree<uint64_t, LandmarkDist>(pre3_file, false);
-
-  MaltHeuristic fwd_h(true, false,  malt_btree, landmark_btree);
-
-  int result = unidirectional_t<MaltHeuristic>(db_dir, start, target, &fwd_h);
-
-  delete malt_btree;
-  delete landmark_btree;
-  return result;
-}
-*/
 
 int spp()
 {

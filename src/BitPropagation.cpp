@@ -3,16 +3,26 @@
 #include <iostream>
 #include <vector>
 #include <boost/random.hpp>
+#include "adjlist.h"
 
-BitPropagation::BitPropagation(const adj_list& outlink, const short width, const uint64_t seed)
-    : outlink(outlink), num_node(outlink.size()), width(width),
-      bitvec_32(num_node), bitvec_32_aux(num_node),
-      bitvec_64(num_node), bitvec_64_aux(num_node),
-      estimate(num_node, -(width*2)), dout(num_node),
-      gen(static_cast<uint64_t>(seed)), dst(0, 1), random(gen, dst) {
+using namespace std;
 
-    for (int i = 0; i < num_node; i++) dout[i] = outlink[i].size();
-    reverse = false;
+BitPropagation::BitPropagation(Adjlist& outlink, const short width, const uint64_t seed)
+  : gen(static_cast<uint64_t>(seed)), dst(0, 1), random(gen, dst) {
+
+  LOG(INFO) << "BitPropagation::BitPropagation started";
+
+  num_node = (* outlink.begin());
+  this->outlink = outlink;
+  this->width   = width;
+  this->bitvec_32 = vector<int32_t>(num_node);
+  this->bitvec_32_aux = vector<int32_t>(num_node);
+  this->bitvec_64     = vector<int64_t>(num_node);
+  this->bitvec_64_aux = vector<int64_t>(num_node);
+  this->estimate = vector<double>(num_node, -(width*2));
+  reverse = false;
+
+  LOG(INFO) << "BitPropagation::BitPropagation finished";
 }
 
 void BitPropagation::init() {
@@ -38,7 +48,7 @@ void BitPropagation::reverseLinks() {
 void BitPropagation::step() {
     distance++;
 
-    std::cerr << "Current distance:" << distance << std::endl;
+    LOG(INFO) << "Current distance:" << distance;
 
     if (width == 32) {
         bitvec_32_aux = std::vector<int>(num_node);
@@ -46,34 +56,33 @@ void BitPropagation::step() {
         bitvec_64_aux = std::vector<int64_t>(num_node);
     }
 
-    std::cerr << "  Calculation step: ";
+    LOG(INFO) << "  Calculation step: ";
 
-    if (width == 32) {
-        for (int src = 0; src < num_node; src++) {
-            if (bitvec_32[src] != 0) {
-                for (int i = 0; i < dout[src]; i++) {
-                    int next = outlink[src][i];
-                    if (reverse) {
-                        bitvec_32_aux[src] |= bitvec_32[next];
-                    } else {
-                        bitvec_32_aux[next] |= bitvec_32[src];
-                    }
-                }
-            }
+    Adjlist::iterator end = outlink.end(); 
+    uint64_t src = 0;
+    for(Adjlist::iterator adj_i = outlink.begin() + 1; adj_i != end; ++adj_i){
+      uint64_t edge_count = (*adj_i);
+      for(uint64_t i = 0; i < edge_count; ++i){
+        ++adj_i;
+        if(width == 32){
+          int32_t next = (*adj_i);
+          if(reverse){
+            bitvec_32_aux[src]  |= bitvec_32[next];
+          }else{
+            bitvec_32_aux[next] |= bitvec_32[src]; 
+          }
+        }else if(width == 64){
+          int64_t next = (*adj_i);
+          if(reverse){
+            bitvec_64_aux[src]  |= bitvec_64[next];
+          }else{
+            bitvec_64_aux[next] |= bitvec_64[src]; 
+          }
+        }else{
+          assert(false);
         }
-    } else if (width == 64) {
-        for (int src = 0; src < num_node; src++) {
-            if (bitvec_64[src] != 0) {
-                for (int i = 0; i < dout[src]; i++) {
-                    int next = outlink[src][i];
-                    if (reverse) {
-                        bitvec_64_aux[src] |= bitvec_64[next];
-                    } else {
-                        bitvec_64_aux[next] |= bitvec_64[src];
-                    }
-                }
-            }
-        }
+      }
+
     }
 
     if (width == 32) {
@@ -98,11 +107,11 @@ void BitPropagation::step() {
         }
     }
 
-    std::cerr << "done." << std::endl;
+    LOG(INFO) << "done.";
 }
 
 void BitPropagation::estimateAll() {
-    std::cerr << "  Doing estimation: ";
+    LOG(INFO) << "  Doing estimation: ";
     for (int i = 0; i < num_node; i++) {
         int ones = 0;
         if (estimate[i] < 0) {
@@ -121,5 +130,6 @@ void BitPropagation::estimateAll() {
         }
     }
 
-    std::cerr << "done." << std::endl;
+    LOG(INFO) << "done.";
 }
+

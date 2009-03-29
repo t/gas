@@ -2,10 +2,15 @@
 
 #include <cmath>
 
-HomogeneousBitPropagation::HomogeneousBitPropagation(const adj_list& outlink, const short width, const uint64_t seed)
+HomogeneousBitPropagation::HomogeneousBitPropagation(Adjlist& outlink, const short width, const uint64_t seed)
     : BitPropagation(outlink, width, seed) {
+
+    LOG(INFO) << "HomogeneousBitPropagation::HomogeneousBitPropagation started";
+
     estimations_cache = std::vector<double>(width + 1);
     epsilon = -1;
+
+    LOG(INFO) << "HomogeneousBitPropagation::HomogeneousBitPropagation finished";
 }
 
 void HomogeneousBitPropagation::setReverse() {
@@ -21,8 +26,8 @@ void HomogeneousBitPropagation::init(double epsilon) {
         // error processing
     }
 
-    std::cerr << "Init with epsilon     : " << epsilon << std::endl;
-    std::cerr << "Ones per bit position : ";
+    LOG(INFO) << "Init with epsilon     : " << epsilon;
+    LOG(INFO) << "Ones per bit position : ";
 
     int i = nextGeometric() + 1;
     double average_bits_set = 0;
@@ -46,11 +51,11 @@ void HomogeneousBitPropagation::init(double epsilon) {
             i = i - num_node;
         }
 
-        std::cerr << set_bits << " ";
+        LOG(INFO) << set_bits;
         average_bits_set += set_bits;
     }
     average_bits_set /= width;
-    std::cerr << " (effective epsilon:" << average_bits_set/num_node << ")" << std::endl;
+    LOG(INFO) << " (effective epsilon:" << average_bits_set/num_node << ")" ;
 
     for (int bit = 0; bit <= width; bit++) {
         estimations_cache[bit] = estimateSupporters((double)bit);

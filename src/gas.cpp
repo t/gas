@@ -15,6 +15,7 @@
 #include "pagerank.h"
 #include "hits.h"
 #include "arg.h"
+#include "supporters.h"
 
 using namespace std;
 
@@ -49,6 +50,8 @@ int main(int argc, char *argv[])
     pagerank();
   }else if(argvs[1] == "hits"){
     hits();
+  }else if(argvs[1] == "supporters"){
+    supporters();
   }
 
   LOG(INFO) << "gas finished";

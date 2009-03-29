@@ -207,9 +207,10 @@ int init( ClusteringInfo & ci )
 
     // eijを登録する
     ci.eij[make_pair(i->key,i->to)] += i->length;
-    ci.eij[make_pair(i->to,i->key)] += i->length;
+    //ci.eij[make_pair(i->to,i->key)] += i->length;
 
-    ci.total_length += i->length * 2;
+    ci.total_length += i->length;
+    //ci.total_length += i->length * 2;
   }
 
   for(vector<Subtree*>::iterator i = ci.subtrees.begin(); i < ci.subtrees.end(); i++){

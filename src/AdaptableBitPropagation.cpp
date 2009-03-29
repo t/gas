@@ -5,7 +5,7 @@
 // for round function
 #include <math.h>
 
-AdaptableBitPropagation::AdaptableBitPropagation(const adj_list& outlink, const short width, const uint64_t seed)
+AdaptableBitPropagation::AdaptableBitPropagation(Adjlist& outlink, const short width, const uint64_t seed)
     : HomogeneousBitPropagation(outlink, width, seed) {}
 
 double AdaptableBitPropagation::estimateSupporters(double ones, double epsilon) {
@@ -32,7 +32,7 @@ double AdaptableBitPropagation::estimateSupporters(int ones, int last_ones, doub
 }
 
 int AdaptableBitPropagation::estimateIfAbove(int minOnes, double multiplier) {
-    std::cerr << "Doing estimation for some nodes (ones >=" << minOnes << "): ";
+    LOG(INFO) << "Doing estimation for some nodes (ones >=" << minOnes << "): ";
 
     int estimated_ok = 0;
     for (int i = 0; i < num_node; i++) {
@@ -59,13 +59,13 @@ int AdaptableBitPropagation::estimateIfAbove(int minOnes, double multiplier) {
             estimated_ok++;
         }
     }
-    std::cerr << estimated_ok << " nodes have estimations now." << std::endl;;
+    LOG(INFO) << estimated_ok << " nodes have estimations now.";
 
     return estimated_ok;
 }
 
 int AdaptableBitPropagation::estimateIfBelow(int maxOnes, double multiplier) {
-    std::cerr << "Doing estimation for some nodes (ones <=" << maxOnes << "): ";
+    LOG(INFO) << "Doing estimation for some nodes (ones <=" << maxOnes << "): ";
 
     int estimated_ok = 0;
     for (int i = 0; i < num_node; i++) {
@@ -92,13 +92,13 @@ int AdaptableBitPropagation::estimateIfBelow(int maxOnes, double multiplier) {
             estimated_ok++;
         }
     }
-    std::cerr << estimated_ok << " nodes have estimations now." << std::endl;
+    LOG(INFO) << estimated_ok << " nodes have estimations now." ;
 
     return estimated_ok;
 }
 
 int AdaptableBitPropagation::estimateAll(double multiplier) {
-    std::cerr << "Doing estimation for all nodes: ";
+    LOG(INFO) << "Doing estimation for all nodes: ";
 
     int estimated_ok = 0;
     for (int i = 0; i < num_node; i++) {
@@ -121,7 +121,7 @@ int AdaptableBitPropagation::estimateAll(double multiplier) {
             estimated_ok++;
         }
     }
-    std::cerr << estimated_ok << " nodes have estimations now." << std::endl;
+    LOG(INFO) << estimated_ok << " nodes have estimations now.";
 
     return estimated_ok;
 }

@@ -63,7 +63,7 @@ int pagerank_calc()
 
     size_t node_i = 0;
     Adjlist::iterator adj_last = adj.end();
-    for(Adjlist::iterator adj_i = adj.begin(); adj_i != adj_last; adj_i++){
+    for(Adjlist::iterator adj_i = adj.begin() + 1; adj_i != adj_last; adj_i++){
       // PageRank PAPER 2.6 Parameter E - calculation of pagerank_src will finish at the end of this loop
       pagerank_src += 1.0 * FLAGS_alpha / node_count * vpr[node_i];
 

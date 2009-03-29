@@ -15,8 +15,7 @@ DEFINE_string(adjlist, "fixed", "Adjlist Type");
 
 using namespace std;
 
-AbstractAdjlist::AbstractAdjlist(bool forward)
-{
+AbstractAdjlist::AbstractAdjlist(bool forward){
   forward_ = forward;
 }
 
@@ -32,6 +31,12 @@ void Adjlist::iterator::increment()
   subject_->increment();
 }
 
+void Adjlist::iterator::advance(int count)
+{
+  for(int i = 0; i < count; i++)
+    increment();
+}
+
 bool Adjlist::iterator::equal(Adjlist::iterator const& other) const
 {
   return subject_->equal(other.subject_.get());
@@ -43,6 +48,11 @@ uint64_t& Adjlist::iterator::dereference() const
 }
 
 // ---------
+
+Adjlist::Adjlist(){
+  forward_ = true;
+  subject_ = NULL;
+}
 
 Adjlist::Adjlist(bool forward){
   forward_ = forward;

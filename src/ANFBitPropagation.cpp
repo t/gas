@@ -4,8 +4,9 @@
 #include <cmath>
 // for round function
 #include <math.h>
+#include "adjlist.h"
 
-ANFBitPropagation::ANFBitPropagation(const adj_list& outlink, const short width, const uint64_t seed)
+ANFBitPropagation::ANFBitPropagation(Adjlist& outlink, const short width, const uint64_t seed)
     :BitPropagation(outlink, width, seed) {
     estimate = std::vector<double>(num_node);
 }
@@ -13,7 +14,7 @@ ANFBitPropagation::ANFBitPropagation(const adj_list& outlink, const short width,
 void ANFBitPropagation::init() {
     BitPropagation::init();
 
-    std::cerr << "Ones per bit position : ";
+    LOG(INFO) << "Ones per bit position : ";
 
     bool last_was_zero = false;
     bool next_last_was_zero = false;
@@ -35,17 +36,16 @@ void ANFBitPropagation::init() {
             i = i + nextGeometric(probability) + 1;
         }
 
-        std::cerr << set_bits << " ";
+        LOG(INFO) << set_bits << " ";
 
         if (set_bits == 0 && last_was_zero && next_last_was_zero) {
-            std::cerr << "(Last 3 were zero, stopping at bit " << bitpos << ")";
+            LOG(INFO) << "(Last 3 were zero, stopping at bit " << bitpos << ")";
             break;
         } else {
             next_last_was_zero = last_was_zero;
             last_was_zero = (set_bits == 0);
         }
     }
-    std::cerr << std::endl;
 }
 
 int ANFBitPropagation::nextGeometric(double probability) {
@@ -72,7 +72,7 @@ double ANFBitPropagation::estimateSupporters(int first_zero) {
 }
 
 void ANFBitPropagation::updateAverageFirstZero() {
-    std::cerr << "  Updating average position of first zero: ";
+    LOG(INFO) << "  Updating average position of first zero: ";
 
     double avg_position = 0;
 
@@ -99,14 +99,14 @@ void ANFBitPropagation::updateAverageFirstZero() {
     }
     avg_position /= num_node;
 
-    std::cerr << "(average " << avg_position << ") done." << std::endl;
+    LOG(INFO) << "(average " << avg_position << ") done.";
 }
 
 void ANFBitPropagation::estimateAll(short nrounds) {
-    std::cerr << "  Doing ANF estimation after " << nrounds << " rounds: ";
+    LOG(INFO) << "  Doing ANF estimation after " << nrounds << " rounds: ";
     for (int i = 0; i < num_node; i++) {
         double first_zero = (double)estimate[i] / (double)nrounds;
         estimate[i] = estimateSupporters(first_zero);
     }
-    std::cerr << "done." << std::endl;
+    LOG(INFO) << "done.";
 }

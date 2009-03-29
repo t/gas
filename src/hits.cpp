@@ -76,7 +76,7 @@ int hits_calc()
 
     size_t node_i = 0;
     Adjlist::iterator adj_last = adj.end();
-    for(Adjlist::iterator adj_i = adj.begin(); adj_i != adj_last; adj_i++){
+    for(Adjlist::iterator adj_i = adj.begin() + 1; adj_i != adj_last; adj_i++){
       const uint64_t edge_count = (*adj_i);
       for(size_t i = 0; i < edge_count; i++){
         adj_i++;

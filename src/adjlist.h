@@ -38,10 +38,12 @@ public:
     iterator(boost::shared_ptr<AbstractAdjlist::iterator> subject);
     bool equal(Adjlist::iterator const& other) const;
     void increment();
+    void advance(int count);
     uint64_t& dereference() const;
   private:
     boost::shared_ptr<AbstractAdjlist::iterator> subject_;
   };
+  Adjlist();
   Adjlist(bool forward);
   ~Adjlist();
   int create();

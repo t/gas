@@ -10,7 +10,14 @@ gas_SOURCES  = src/gas.cpp \
                src/pagerank.cpp \
                src/hits.cpp \
                src/modularityq.cpp \
-               src/arg.cpp 
+               src/arg.cpp \
+               src/run_bit_propagation_org.cpp \
+               src/supporters.cpp \
+               src/HomogeneousBitPropagation.cpp \
+               src/EpsilonestimateAdaptableBitPropagation.cpp \
+               src/ANFBitPropagation.cpp \
+               src/AdaptableBitPropagation.cpp \
+               src/BitPropagation.cpp
 gas_LDADD=-lboost_filesystem -lpthread -lgflags -lglog
 nhash_SOURCES=src/nhash.cpp
 nhash_LDADD=-lboost_program_options

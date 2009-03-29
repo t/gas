@@ -6,15 +6,15 @@
 #include <boost/random.hpp>
 #include <stdint.h>
 
-#include "../header/common.hpp"
+#include "adjlist.h"
 
 class BitPropagation {
 private:
     bool reverse;
 protected:
-    const adj_list outlink;
-    const int num_node;
-    const short width;
+    Adjlist outlink;
+    int num_node;
+    short width;
 
     std::vector<int> bitvec_32;
     std::vector<int> bitvec_32_aux;
@@ -25,8 +25,6 @@ protected:
 
     int distance;
 
-    std::vector<int> dout;
-
     // for random genetator
     boost::mt19937 gen;
     boost::uniform_real<> dst;
@@ -34,7 +32,7 @@ protected:
 
     std::vector<int> leader_docid;
 public:
-    BitPropagation(const adj_list& outlink, const short width, const uint64_t seed);
+    BitPropagation(Adjlist& outlink, const short width, const uint64_t seed);
     ~BitPropagation() {}
 
     int get_num_node() const { return num_node; }
@@ -44,7 +42,10 @@ public:
     virtual void reverseLinks();
     virtual void step();
 
-    virtual double estimateSupporters(int ones) = 0;
+    //virtual double estimateSupporters(int ones);
+    //virtual double estimateSupporters(double ones);
+
+    virtual double estimateSupporters(int ones)    = 0;
     virtual double estimateSupporters(double ones) = 0;
 
     virtual void estimateAll();
