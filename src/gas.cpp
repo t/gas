@@ -1,5 +1,3 @@
-#include <iostream>
-#include <string>
 /*
 Copyright (C) 2009 t@foo.jp
 
@@ -18,6 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+#include <iostream>
+#include <string>
 #include <strstream>
 #include <fstream>
 #include <vector>
