@@ -1,3 +1,13 @@
+/*
+  This Program includes SuperFashHash and Murmurhash 2.0 codes.
+
+  SuperFastHash
+  http://www.azillionmonkeys.com/qed/hash.html  
+
+  MurmurHash 2.0
+  http://murmurhash.googlepages.com/
+*/
+
 #include <vector>
 #include <queue>
 #include <algorithm>

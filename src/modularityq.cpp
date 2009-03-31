@@ -45,6 +45,7 @@ struct ClusteringInfo{
   double                                total_length;
   uint64_t                              max_idx;
   vector<qitem>                         uqs;
+  double                                q;
 };
 
 bool delete_qitem(const qitem &a)
@@ -149,6 +150,7 @@ void print_result(ClusteringInfo & ci)
 {
   int num = 0;
   cout << "result:" << endl;
+  cout << "  q: " << ci.q << endl;
   cout << "  clusters:" << endl;
   for(vector<Subtree *>::const_iterator i = ci.subtrees.begin() ; i < ci.subtrees.end() ; ++i){
     num++;
@@ -225,8 +227,7 @@ int init( ClusteringInfo & ci )
 
 int clustering( ClusteringInfo & ci)
 {
-  double q = get_q(ci);
-  LOG(INFO) << "init q is " << q;
+  ci.q = get_q(ci);
 
   for(vector<Subtree *>::const_iterator i = ci.subtrees.begin() ; i < ci.subtrees.end() - 1; ++i){
     for(vector<Subtree *>::const_iterator j = i + 1; j < ci.subtrees.end(); ++j){
@@ -288,10 +289,10 @@ int clustering( ClusteringInfo & ci)
     }
 
     // JOIN!
-    q += max_uq;
-    join(ci, max_i, max_j, height, q);
+    ci.q += max_uq;
+    join(ci, max_i, max_j, height, ci.q);
 
-    LOG(INFO) << "q is " << q;
+    LOG(INFO) << "q is " << ci.q;
     //cout << "recalc( " << get_q() << " )" << endl;
   }
  
