@@ -31,8 +31,19 @@ class MmapVector
     {
       size_t new_length = (((require + HEADER_SIZE) / _page_size) + 1) * _page_size;
       ftruncate(_fd, new_length);
+
+#if HAVE_MREMAP
       _mmap_start  = (char*) mremap(_mmap_start, _mmap_length, new_length, MREMAP_MAYMOVE);
       assert(_mmap_start != MAP_FAILED);
+#else
+      munmap(_mmap_start, _mmap_length);
+      char * start = (char *) mmap(0, new_length, PROT_READ | PROT_WRITE,  MAP_SHARED, _fd, 0);
+      if(start < 0){
+        perror("mmaperror");
+        exit(-1);
+      }
+      _mmap_start = start;
+#endif
 
      //madvise(_mmap_start, new_length, MADV_RANDOM);
       _mmap_length = new_length;
